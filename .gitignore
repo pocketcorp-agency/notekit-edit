@@ -3,3 +3,8 @@ main.js
 *.map
 .DS_Store
 docs/trailer/run-edits.cjs
+docs/trailer/ae/renders/*.mp4
+docs/trailer/ae/renders/*.m4v
+docs/trailer/ae/renders/render.log
+docs/trailer/ae/*.aep.bak
+docs/trailer/ae/Adobe After Effects Auto-Save/

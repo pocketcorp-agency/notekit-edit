@@ -1,0 +1,472 @@
+/* ---- Highlights in the editor ---- */
+
+.ai-edit-range {
+  border-radius: 3px;
+  transition: background-color 0.3s ease;
+}
+
+.ai-edit-target {
+  background-color: rgba(var(--color-purple-rgb), 0.18);
+  box-shadow: 0 0 0 1px rgba(var(--color-purple-rgb), 0.35);
+}
+
+.ai-edit-generating {
+  color: var(--text-muted);
+  background: linear-gradient(
+    100deg,
+    rgba(var(--color-purple-rgb), 0.12) 20%,
+    rgba(var(--color-purple-rgb), 0.38) 50%,
+    rgba(var(--color-purple-rgb), 0.12) 80%
+  );
+  background-size: 200% 100%;
+  animation: ai-edit-shimmer 1.4s linear infinite;
+  border-bottom: 2px dotted rgba(var(--color-purple-rgb), 0.8);
+}
+
+.ai-edit-done {
+  background-color: rgba(var(--color-green-rgb), 0.22);
+  animation: ai-edit-fade 2s ease forwards;
+}
+
+.ai-edit-error {
+  background-color: rgba(var(--color-red-rgb), 0.18);
+  text-decoration: underline wavy var(--color-red);
+}
+
+@keyframes ai-edit-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: 0 0; }
+}
+
+@keyframes ai-edit-fade {
+  from { background-color: rgba(var(--color-green-rgb), 0.28); }
+  to   { background-color: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-edit-generating { animation: none; }
+}
+
+/* Cursor-mode indicator: a pulsing bar where text will be inserted. */
+.ai-edit-caret {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  vertical-align: text-bottom;
+  border-radius: 2px;
+  background: var(--color-purple);
+  margin: 0 1px;
+}
+.ai-edit-caret-generating {
+  animation: ai-edit-pulse 0.9s ease-in-out infinite;
+}
+.ai-edit-caret-error { background: var(--color-red); }
+.ai-edit-caret-done { background: var(--color-green); }
+
+@keyframes ai-edit-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* Progress badge shown after the range while an agent is working. */
+.ai-edit-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 1px 7px 1px 5px;
+  border-radius: 999px;
+  font-size: 0.75em;
+  font-family: var(--font-interface);
+  font-style: normal;
+  font-weight: var(--font-medium);
+  color: var(--color-purple);
+  background: rgba(var(--color-purple-rgb), 0.12);
+  vertical-align: middle;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ai-edit-spinner {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  border: 2px solid rgba(var(--color-purple-rgb), 0.25);
+  border-top-color: var(--color-purple);
+  border-radius: 50%;
+  animation: ai-edit-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes ai-edit-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-edit-spinner { animation-duration: 2s; }
+}
+
+/* ---- Status bar ---- */
+
+.ai-edit-status:empty { display: none; }
+.ai-edit-status.is-active { color: var(--color-purple); }
+
+/* ---- Prompt box ---- */
+
+.ai-edit-box {
+  position: fixed;
+  z-index: var(--layer-popover);
+  width: min(380px, calc(100vw - 16px));
+  padding: 8px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-s);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--font-ui-small);
+  animation: ai-edit-pop 0.12s ease-out;
+}
+
+@keyframes ai-edit-pop {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.ai-edit-box-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  min-width: 0;
+}
+
+.ai-edit-box-icon {
+  display: inline-flex;
+  color: var(--color-purple);
+  flex-shrink: 0;
+}
+.ai-edit-box-icon svg { width: 14px; height: 14px; }
+
+.ai-edit-box-excerpt {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: italic;
+}
+
+.ai-edit-box-agent {
+  flex-shrink: 0;
+  max-width: 45%;
+  height: 24px;
+  padding: 0 22px 0 8px;
+  font-size: var(--font-ui-smaller);
+  background-size: 12px;
+  background-position: right 6px center;
+}
+
+.ai-edit-box-agent-name {
+  flex-shrink: 0;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  max-width: 35%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-edit-box-close {
+  flex-shrink: 0;
+  padding: 2px;
+  margin: -2px;
+  background: none;
+  box-shadow: none;
+  border: none;
+}
+.ai-edit-box-close svg { width: 14px; height: 14px; }
+
+.ai-edit-box-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.ai-edit-box-input textarea {
+  flex: 1;
+  resize: none;
+  min-height: 32px;
+  max-height: 160px;
+  padding: 6px 8px;
+  font-size: var(--font-ui-small);
+  line-height: 1.4;
+  font-family: var(--font-interface);
+}
+
+.ai-edit-box-send {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-edit-box-send svg { width: 16px; height: 16px; }
+
+/* ---- Mobile: the box is hosted inside an Obsidian modal (bottom sheet) ---- */
+
+.ai-edit-box.is-mobile {
+  position: static;
+  width: 100%;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  font-size: var(--font-ui-medium);
+  gap: 10px;
+  animation: none;
+}
+
+.ai-edit-box.is-mobile .ai-edit-box-agent {
+  flex-shrink: 0;
+  max-width: 45%;
+  height: 24px;
+  padding: 0 22px 0 8px;
+  font-size: var(--font-ui-smaller);
+  background-size: 12px;
+  background-position: right 6px center;
+}
+
+.ai-edit-box-agent-name {
+  flex-shrink: 0;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  max-width: 35%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-edit-box-close {
+  display: none; /* the modal has its own close button */
+}
+
+.ai-edit-box.is-mobile .ai-edit-box-input textarea {
+  font-size: 16px; /* prevents iOS from zooming the page on focus */
+  min-height: 40px;
+}
+
+.ai-edit-box.is-mobile .ai-edit-box-send {
+  width: 40px;
+  height: 40px;
+}
+
+
+/* ---- Settings: agent cards ---- */
+
+.ai-edit-provider {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 4px 14px;
+  margin-bottom: 14px;
+}
+
+.ai-edit-provider.is-default {
+  border-color: rgba(var(--color-purple-rgb), 0.6);
+}
+
+.ai-edit-provider .setting-item {
+  border-top: none;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.ai-edit-provider .ai-edit-provider-head {
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ai-edit-provider .ai-edit-provider-head .setting-item-name {
+  font-weight: var(--font-semibold);
+}
+
+/* ---- Setup wizard ---- */
+
+.ai-edit-wizard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.ai-edit-wizard-card {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  cursor: pointer;
+  background: var(--background-secondary);
+}
+
+.ai-edit-wizard-card:hover {
+  background: var(--background-modifier-hover);
+}
+
+.ai-edit-wizard-card.is-selected {
+  border-color: var(--color-purple);
+  box-shadow: 0 0 0 1px var(--color-purple);
+}
+
+.ai-edit-wizard-card-icon {
+  color: var(--color-purple);
+  flex-shrink: 0;
+}
+.ai-edit-wizard-card-icon svg { width: 20px; height: 20px; }
+
+.ai-edit-wizard-card-title {
+  font-weight: var(--font-semibold);
+  margin-bottom: 2px;
+}
+
+.ai-edit-wizard-card-desc {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.ai-edit-wizard-input {
+  width: 100%;
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.ai-edit-wizard-status {
+  min-height: 1.4em;
+  margin: 8px 0;
+  font-size: var(--font-ui-small);
+}
+
+.ai-edit-wizard-hint {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.ai-edit-wizard-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* ---- Sidebar: AI edits log ---- */
+
+.ai-edit-log {
+  padding: 0;
+}
+
+.ai-edit-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ai-edit-log-title {
+  font-weight: var(--font-semibold);
+}
+
+.ai-edit-log-empty {
+  padding: 24px 16px;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: var(--font-ui-small);
+}
+
+.ai-edit-log-card {
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ai-edit-log-card-head {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  align-items: flex-start;
+}
+.ai-edit-log-card-head:hover {
+  background: var(--background-modifier-hover);
+}
+
+.ai-edit-log-status {
+  display: inline-flex;
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.ai-edit-log-status svg { width: 14px; height: 14px; }
+.ai-edit-log-card.is-done .ai-edit-log-status { color: var(--color-green); }
+.ai-edit-log-card.is-error .ai-edit-log-status { color: var(--color-red); }
+
+.ai-edit-log-card-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.ai-edit-log-instruction {
+  font-size: var(--font-ui-small);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ai-edit-log-card.is-open .ai-edit-log-instruction {
+  white-space: normal;
+}
+
+.ai-edit-log-meta {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  margin-top: 2px;
+}
+
+.ai-edit-log-body {
+  padding: 0 12px 12px 36px;
+}
+
+.ai-edit-log-error {
+  color: var(--color-red);
+  font-size: var(--font-ui-small);
+  margin-bottom: 8px;
+}
+
+.ai-edit-log-cancel {
+  margin-bottom: 8px;
+}
+
+.ai-edit-log-section {
+  margin-top: 8px;
+}
+
+.ai-edit-log-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-ui-smaller);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.ai-edit-log-pre {
+  margin: 0;
+  padding: 8px;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: var(--font-ui-smaller);
+  background: var(--background-secondary);
+  border-radius: var(--radius-s);
+}

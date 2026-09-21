@@ -171,3 +171,22 @@ with the plugin's real `styles.css` (same renderer as `docs/screenshots/`).
    stagger). Typing effects via `Source Text` expressions on the instruction and output layers.
 5. Shimmer: gradient ramp on the highlight matte + `offset` expression; spinner: rotation `time*450`.
 6. Audit: `ae_audit_motion` + `ae_audit_frame` on every scene; export a contact sheet, fix, then render H.264.
+
+---
+
+## 7. As built (2026-09-21)
+
+- **Project:** `docs/trailer/ae/AI-Inline-Edit-Trailer.aep` — master comp `TRAILER` (1920×1080, 30 fps, 56 s) with a real
+  two-node camera, every scene as a 3D card. Scene comps `S0_NOTE … S7_OUTRO`, overlays `OV_MENU_*` / `OV_BOX_*`, and
+  precomps `grp_*` / `BADGE` / `TILE` / `MODAL` / `LOGO` are all native, editable layers.
+- **How it was built:** the scene frames were authored as HTML (`ae/gen-scenes.py` → `ae/html/*.html`) and turned into
+  native text/shape layers with the Higgsfield `ae_build_scene_from_html` pipeline; choreography, the camera and the
+  assembly were scripted in ExtendScript (`ae/jsx/*.jsx`, run through `DoScript`). Re-run order:
+  `cleanup → scene-s1 … scene-s6s7 → master → plates`.
+- **Real content:** the streamed bullet list is the actual Claude Code output and the packing list the actual Codex
+  output from `docs/trailer/outputs/`.
+- **Generated plates:** three Seedance 2.5 image-to-video plates from AE frames (cold open, devices, logo); see
+  `ae/media/MANIFEST.md`. The fourth plate (glowing highlight) was generated but not used.
+- **Render:** `aerender` → `ae/renders/AI-Inline-Edit-Trailer.mp4` (H.264, 40 Mbit/s, Best settings).
+- **Not done:** music/VO — Higgsfield has no standalone music model, so the cut is silent; drop a 100–110 bpm track
+  under it (hits at 0:33 and 0:44) in AE or Premiere.

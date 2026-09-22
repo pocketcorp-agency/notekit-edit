@@ -48,7 +48,7 @@ Watch the [full trailer](docs/media/trailer-preview.mp4) (MP4, 960p preview).
 
 ## Quick start
 
-1. Install from the community plugin list (search for "Notekit Edit") or download `main.js`,
+1. Install from the community plugin list (search for "Notekit Edit", once listed) or download `main.js`,
    `manifest.json` and `styles.css` from the [latest release](https://github.com/pocketcorp-agency/notekit-edit/releases/latest)
    into `<vault>/.obsidian/plugins/notekit-edit/`, then enable the plugin.
 2. The setup wizard opens: choose Claude or Codex, then subscription or API key. With a subscription

@@ -47,18 +47,39 @@ If `minAppVersion` changes, edit it in `manifest.json` before bumping so `versio
 
 ## Community plugin list
 
-The first submission is a pull request to
-[obsidianmd/obsidian-releases](https://github.com/obsidianmd/obsidian-releases) adding this entry to
-`community-plugins.json`:
+Submission happens on the Obsidian community site, not through a pull request any more
+(the old flow edited `community-plugins.json` in `obsidianmd/obsidian-releases`).
 
-```json
-{
-  "id": "notekit-edit",
-  "name": "Notekit Edit",
-  "author": "pocketcorp",
-  "description": "Select text or place the cursor, tell Claude or Codex what to write or change, and watch it stream into the note. Uses your existing Claude/ChatGPT subscription or an API key.",
-  "repo": "pocketcorp-agency/notekit-edit"
-}
-```
+Before submitting, make sure that:
 
-Later releases only need the tag; Obsidian reads new versions from the GitHub releases.
+- the repository is public and has `README.md`, `LICENSE` and `manifest.json` in its root;
+- a GitHub release exists whose tag equals `manifest.json`'s version exactly (`0.2.0`, no `v`), with
+  `main.js`, `manifest.json` and `styles.css` attached as individual assets, not a zip;
+- the plugin `id` is unique across the directory and does not contain "obsidian" (`notekit-edit`);
+- `npm run lint` is clean: it runs `eslint-plugin-obsidianmd`, the same guideline rules the reviewers
+  apply.
+
+Then:
+
+1. Sign in at [community.obsidian.md](https://community.obsidian.md) with your Obsidian account.
+2. Link the GitHub account that owns the repository, so ownership can be verified.
+3. Add the plugin by repository (`pocketcorp-agency/notekit-edit`). The listing's name, author and
+   description come from `manifest.json`; the detail page renders the repository's `README.md`.
+4. Wait for the automated validation and the review. If changes are requested, fix them, bump the
+   version and publish a new release, then reply on the submission.
+
+Until the plugin is listed, users can install it with
+[BRAT](https://obsidian.md/plugins?id=obsidian42-brat) by pointing it at `pocketcorp-agency/notekit-edit`,
+or by copying `main.js`, `manifest.json` and `styles.css` from a release into
+`<vault>/.obsidian/plugins/notekit-edit/`.
+
+After approval, Obsidian reads new versions straight from the GitHub releases: tagging a release is all
+a future update needs.
+
+### What reviewers look at in this plugin
+
+- It spawns local processes (`claude`, `codex`, an ACP agent) on desktop. `canSpawn()` gates that, and
+  the agent cards say it is desktop only, so the mobile build never tries.
+- It sends note content to a third-party endpoint chosen by the user. The README and
+  [agents.md](agents.md) state what is sent and where; nothing is sent until an agent is configured.
+- API keys live in the vault's plugin data. That is documented in the README's privacy section.

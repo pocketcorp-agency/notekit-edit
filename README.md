@@ -6,12 +6,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/ci.yml"><img src="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/release.yml"><img src="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/release.yml/badge.svg" alt="Release"></a>
+  <a href="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/ci.yml"><img src="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
   <a href="https://github.com/pocketcorp-agency/notekit-edit/releases/latest"><img src="https://img.shields.io/github/v/release/pocketcorp-agency/notekit-edit?label=release&color=7f6df2" alt="Latest release"></a>
-  <a href="https://github.com/pocketcorp-agency/notekit-edit/releases"><img src="https://img.shields.io/github/downloads/pocketcorp-agency/notekit-edit/total?color=7f6df2" alt="Downloads"></a>
+  <a href="https://github.com/pocketcorp-agency/notekit-edit/releases"><img src="https://img.shields.io/github/downloads/pocketcorp-agency/notekit-edit/total?label=downloads&color=7f6df2" alt="Downloads"></a>
   <a href="manifest.json"><img src="https://img.shields.io/badge/Obsidian-1.7.2%2B-483699" alt="Obsidian 1.7.2 or newer"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/pocketcorp-agency/notekit-edit" alt="MIT license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license"></a>
+  <a href="https://pocketcorp.agency"><img src="https://img.shields.io/badge/by-pocketcorp-111111" alt="Made by pocketcorp"></a>
 </p>
 
 Notekit Edit is an [Obsidian](https://obsidian.md) plugin that turns any passage of a note into a

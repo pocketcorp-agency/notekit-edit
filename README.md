@@ -77,12 +77,61 @@ The full walkthrough is in [docs/getting-started.md](docs/getting-started.md).
 - For subscription use on desktop: [Claude Code](https://docs.claude.com/en/docs/claude-code) (`claude`)
   and/or the [Codex CLI](https://developers.openai.com/codex/cli) (`codex`), logged in.
 - For mobile subscription use: a computer running the bridge (Node 18 or newer).
+- An account with the AI provider you choose: a Claude or ChatGPT subscription, or an Anthropic or
+  OpenAI API key (pay per use), or your own OpenAI-compatible server.
 
-## Privacy
+## Privacy, network access and security
 
-Requests go straight from Obsidian to the agent you configured; there is no intermediate service. The
-whole note is sent as context. API keys and bridge keys are stored in the vault's
-`.obsidian/plugins/notekit-edit/data.json`; exclude that file from syncs you do not trust.
+This section lists everything the plugin does beyond editing text inside Obsidian, as required by the
+[Obsidian developer policies](https://docs.obsidian.md/Developer+policies).
+
+**Network requests.** Nothing is sent anywhere until you configure an agent. The plugin then talks
+directly to the service behind the agent you selected; there is no intermediate server run by
+pocketcorp. Depending on the agent type it connects to:
+
+- the Anthropic API at `https://api.anthropic.com` (agent type *Claude (Anthropic API key)*), or a
+  base URL you enter instead;
+- the OpenAI API at `https://api.openai.com` (the wizard's *OpenAI (API key)* choice);
+- any OpenAI-compatible endpoint you enter as base URL (Hermes Agent, Ollama, LM Studio, OpenRouter,
+  vLLM, or the plugin's own bridge running on one of your computers);
+- for the CLI and ACP agents, the plugin itself makes no request: the `claude`, `codex` or ACP process
+  it starts connects to its own provider (Anthropic, OpenAI, Google, or whatever the agent uses) with
+  that tool's login.
+
+The **Test** button on an agent card makes one request to the same endpoint (`/models`, the CLI's
+`--version` and login status, or an ACP `initialize`).
+
+**What is sent.** Every edit sends the full content of the current note (capped at 150,000 characters
+before and after the target for very large notes), the note's name, the selected text or the cursor
+position, your instruction, and the *Extra instructions* from the settings. No other notes and no
+vault metadata are sent. Nothing is sent when you only open the prompt box.
+
+**External executables.** On desktop, and only for agents of the types *Claude Code CLI*, *Codex CLI*
+and *ACP agent*, the plugin starts a local process with the command you configured: `claude -p`
+(with tools disabled), `codex exec` (read-only sandbox, no approvals) or the ACP command line, using
+the vault folder as working directory. The command is resolved on your `PATH` plus the usual CLI
+install locations (`/opt/homebrew/bin`, `/usr/local/bin`, `~/.local/bin`, nvm, volta, bun). With an
+ACP agent and *Allow tools* switched on, the agent may read and write files inside the vault folder
+and run commands there; leave it off unless you want that. Mobile builds never start processes; those
+agent types report an error and you use an API key or the bridge instead.
+
+**Stored credentials.** API keys, bridge keys and any extra headers you enter are stored in plain
+text in the vault's `.obsidian/plugins/notekit-edit/data.json`, together with the agent
+configuration and the last 50 entries of the edits panel (instruction, original text, output and
+reasoning). Exclude that file from syncs or backups you do not trust, and remember that vault sync
+services copy it. The CLI agents store nothing in Obsidian; they reuse the login kept by the CLI.
+
+**Accounts and payment.** The plugin is free and open source, but every agent needs an account with
+its provider: a Claude Pro/Max or ChatGPT subscription for the CLI agents, a paid Anthropic or OpenAI
+API key, or your own server.
+
+**Telemetry.** None. The plugin collects no usage data, contains no analytics or crash reporting, and
+does not phone home; the only network traffic is the requests to the agent you selected. Nothing is
+logged to the developer console during normal use.
+
+**The bridge.** `bridge/claude-bridge.cjs` is an optional Node script you run yourself on a computer.
+It listens on the network (all interfaces, port 8765 by default), requires a key, and forwards
+requests to the local CLI or ACP agent. See [docs/bridge.md](docs/bridge.md) for its security notes.
 
 ## License
 

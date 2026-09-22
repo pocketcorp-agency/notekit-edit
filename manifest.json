@@ -1,9 +1,9 @@
 {
   "id": "notekit-edit",
   "name": "Notekit Edit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "minAppVersion": "1.7.2",
-  "description": "Select text or place the cursor, tell Claude or Codex what to write or change, and watch it stream into the note. Uses your existing Claude/ChatGPT subscription or an API key. Works on desktop and mobile.",
+  "description": "Select text or place the cursor, describe the change, and watch Claude or Codex stream it into the note. Uses your Claude or ChatGPT subscription, an API key, or any OpenAI-compatible agent.",
   "author": "pocketcorp",
   "isDesktopOnly": false,
   "authorUrl": "https://pocketcorp.agency"

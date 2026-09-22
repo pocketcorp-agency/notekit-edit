@@ -29,9 +29,15 @@ interface NodeModules {
   os: typeof import("os");
   path: typeof import("path");
   fs: typeof import("fs");
+  process: typeof import("process");
 }
 
-/** Electron exposes Node's `require` on desktop; on mobile it doesn't exist. */
+/**
+ * Electron exposes Node's `require` on desktop; on mobile it doesn't exist, so
+ * every Node module is resolved lazily through this function and never at
+ * module top level. The plugin only reaches this code after checking
+ * `Platform.isDesktopApp` (see `requireDesktop()` in ai.ts).
+ */
 function nodeRequire<K extends keyof NodeModules>(id: K): NodeModules[K] {
   const r = (globalThis as { require?: NodeRequire }).require;
   if (typeof r !== "function") {
@@ -83,7 +89,7 @@ function extraPathDirs(): string[] {
 /** PATH with the usual CLI locations appended, so `claude`/`npx` resolve from inside Obsidian. */
 export function augmentedEnv(extra: Record<string, string> = {}): Record<string, string> {
   const path = nodeRequire("path");
-  const env: Record<string, string> = { ...(process.env as Record<string, string>) };
+  const env: Record<string, string> = { ...(nodeRequire("process").env as Record<string, string>) };
   const current = env.PATH ?? env.Path ?? "";
   const parts = new Set(current.split(path.delimiter).filter(Boolean));
   for (const d of extraPathDirs()) parts.add(d);
@@ -100,7 +106,7 @@ export function resolveCommand(command: string): string {
   const path = nodeRequire("path");
   const fs = nodeRequire("fs");
   if (command.includes("/") || command.includes("\\")) return expandHome(command);
-  const exts = process.platform === "win32" ? ["", ".cmd", ".exe", ".bat"] : [""];
+  const exts = nodeRequire("process").platform === "win32" ? ["", ".cmd", ".exe", ".bat"] : [""];
   for (const dir of augmentedEnv().PATH.split(path.delimiter)) {
     for (const ext of exts) {
       const candidate = path.join(dir, command + ext);
@@ -137,7 +143,7 @@ export function spawnLineProcess(command: string, args: string[], opts: SpawnOpt
     env: augmentedEnv(opts.env),
     stdio: ["pipe", "pipe", "pipe"],
     windowsHide: true,
-    shell: process.platform === "win32" && /\.(cmd|bat)$/i.test(resolved),
+    shell: nodeRequire("process").platform === "win32" && /\.(cmd|bat)$/i.test(resolved),
   });
 
   const lineCbs: Array<(line: string) => void> = [];

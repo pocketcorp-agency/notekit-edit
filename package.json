@@ -1,7 +1,7 @@
 {
   "name": "notekit-edit",
-  "version": "0.2.0",
-  "description": "Select text, tell Claude what to change, and watch it rewrite the passage in place.",
+  "version": "0.2.1",
+  "description": "Select text or place the cursor, describe the change, and watch Claude or Codex stream it into the note. Uses your Claude or ChatGPT subscription, an API key, or any OpenAI-compatible agent.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
@@ -26,11 +26,10 @@
     "@codemirror/state": "6.5.0",
     "@codemirror/view": "6.38.6",
     "@types/node": "^22.0.0",
-    "builtin-modules": "^4.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.39.5",
     "eslint-plugin-obsidianmd": "^0.4.2",
-    "obsidian": "latest",
+    "obsidian": "1.7.2",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.70.1"
   },

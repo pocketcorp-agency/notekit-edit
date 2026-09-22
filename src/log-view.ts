@@ -1,5 +1,5 @@
 import { ItemView, setIcon, type WorkspaceLeaf } from "obsidian";
-import type AIInlineEditPlugin from "./main";
+import type NotekitEditPlugin from "./main";
 import type { EditRecord } from "./history";
 
 export const LOG_VIEW_TYPE = "notekit-edit-log";
@@ -10,7 +10,7 @@ export class EditLogView extends ItemView {
   private expanded = new Set<string>();
   private pending: number | null = null;
 
-  constructor(leaf: WorkspaceLeaf, private plugin: AIInlineEditPlugin) {
+  constructor(leaf: WorkspaceLeaf, private plugin: NotekitEditPlugin) {
     super(leaf);
   }
 
@@ -42,10 +42,15 @@ export class EditLogView extends ItemView {
     this.render();
   }
 
+  async onClose(): Promise<void> {
+    if (this.pending !== null) this.contentEl.win.cancelAnimationFrame(this.pending);
+    this.pending = null;
+  }
+
   /** Streaming produces many change events; coalesce them into one render per frame. */
   private scheduleRender(): void {
     if (this.pending !== null) return;
-    this.pending = window.requestAnimationFrame(() => {
+    this.pending = this.contentEl.win.requestAnimationFrame(() => {
       this.pending = null;
       this.render();
     });

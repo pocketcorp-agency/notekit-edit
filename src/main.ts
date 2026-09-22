@@ -7,10 +7,10 @@ import { PromptBox } from "./prompt-box";
 import { EditHistory, type EditRecord } from "./history";
 import { EditLogView, LOG_VIEW_TYPE } from "./log-view";
 import { SetupWizard } from "./wizard";
-import { AIInlineEditSettingTab, type AIInlineEditSettings, DEFAULT_SETTINGS, getProvider, migrateSettings, type Provider } from "./settings";
+import { NotekitEditSettingTab, type NotekitEditSettings, DEFAULT_SETTINGS, getProvider, migrateSettings, type Provider } from "./settings";
 
-export default class AIInlineEditPlugin extends Plugin {
-  settings: AIInlineEditSettings = DEFAULT_SETTINGS;
+export default class NotekitEditPlugin extends Plugin {
+  settings: NotekitEditSettings = DEFAULT_SETTINGS;
   history = new EditHistory();
   private box: PromptBox | null = null;
   private active = new Map<string, AbortController>();
@@ -18,7 +18,7 @@ export default class AIInlineEditPlugin extends Plugin {
 
   async onload(): Promise<void> {
     await this.loadSettings();
-    this.addSettingTab(new AIInlineEditSettingTab(this.app, this));
+    this.addSettingTab(new NotekitEditSettingTab(this.app, this));
 
     this.registerView(LOG_VIEW_TYPE, (leaf) => new EditLogView(leaf, this));
     this.addRibbonIcon("sparkles", "AI edits", () => void this.openLogView());
@@ -43,7 +43,7 @@ export default class AIInlineEditPlugin extends Plugin {
 
     this.addCommand({
       id: "ask-ai-edit",
-      name: "Ask AI to edit selection / write at cursor",
+      name: "Ask AI to edit selection or write at cursor",
       icon: "sparkles",
       editorCallback: (editor) => this.openBoxForEditor(editor),
     });
@@ -188,7 +188,7 @@ export default class AIInlineEditPlugin extends Plugin {
     const provider = getProvider(this.settings, providerId);
     if (!provider) {
       view.dispatch({ effects: removeJob.of(id) });
-      new Notice("No agent configured. Add one in Settings → Notekit Edit.");
+      new Notice("No agent configured. Add one in the plugin settings.");
       return;
     }
     const original = view.state.sliceDoc(from, to);
@@ -297,7 +297,7 @@ export default class AIInlineEditPlugin extends Plugin {
   }
 
   private scheduleRemove(view: EditorView, id: string, ms: number): void {
-    window.setTimeout(() => {
+    view.dom.win.setTimeout(() => {
       try {
         if (getJob(view, id)) view.dispatch({ effects: removeJob.of(id) });
       } catch {

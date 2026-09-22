@@ -1,5 +1,5 @@
 import { App, Notice, Platform, PluginSettingTab, Setting } from "obsidian";
-import type AIInlineEditPlugin from "./main";
+import type NotekitEditPlugin from "./main";
 import { testProvider } from "./ai";
 
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
@@ -27,7 +27,7 @@ export interface Provider {
 export const LOCAL_TYPES: ProviderType[] = ["claude-code", "codex-cli", "acp"];
 export const isLocalProvider = (p: Provider): boolean => LOCAL_TYPES.includes(p.type);
 
-export interface AIInlineEditSettings {
+export interface NotekitEditSettings {
   /** True once the first-run wizard has finished (or been skipped). */
   setupDone: boolean;
   providers: Provider[];
@@ -38,7 +38,7 @@ export interface AIInlineEditSettings {
   extraInstructions: string;
 }
 
-export const DEFAULT_SETTINGS: AIInlineEditSettings = {
+export const DEFAULT_SETTINGS: NotekitEditSettings = {
   setupDone: false,
   providers: [],
   defaultProviderId: "",
@@ -70,9 +70,9 @@ export function newProvider(preset: Preset): Provider {
  * versions stored a single Anthropic key/model at the top level; those become
  * the first provider.
  */
-export function migrateSettings(raw: unknown): AIInlineEditSettings {
-  const data = (raw ?? {}) as Partial<AIInlineEditSettings> & { apiKey?: string; model?: string; effort?: Effort };
-  const settings: AIInlineEditSettings = { ...DEFAULT_SETTINGS, ...data, providers: [] };
+export function migrateSettings(raw: unknown): NotekitEditSettings {
+  const data = (raw ?? {}) as Partial<NotekitEditSettings> & { apiKey?: string; model?: string; effort?: Effort };
+  const settings: NotekitEditSettings = { ...DEFAULT_SETTINGS, ...data, providers: [] };
 
   settings.setupDone = Boolean(data.setupDone);
   if (Array.isArray(data.providers) && data.providers.length) {
@@ -101,12 +101,12 @@ export function migrateSettings(raw: unknown): AIInlineEditSettings {
   return settings;
 }
 
-export function getProvider(settings: AIInlineEditSettings, id?: string): Provider | undefined {
+export function getProvider(settings: NotekitEditSettings, id?: string): Provider | undefined {
   return settings.providers.find((p) => p.id === (id ?? settings.defaultProviderId)) ?? settings.providers[0];
 }
 
-export class AIInlineEditSettingTab extends PluginSettingTab {
-  constructor(app: App, private plugin: AIInlineEditPlugin) {
+export class NotekitEditSettingTab extends PluginSettingTab {
+  constructor(app: App, private plugin: NotekitEditPlugin) {
     super(app, plugin);
   }
 
@@ -136,7 +136,7 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Extra instructions")
-      .setDesc("Appended to the system prompt on every request, e.g. your writing style or language preferences.")
+      .setDesc("Appended to the system prompt on every request, for example your writing style or language preferences.")
       .addTextArea((t) => {
         t.inputEl.rows = 4;
         t.setPlaceholder("Write in British English. Never use em dashes.")
@@ -160,6 +160,11 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
       );
   }
 
+  /** Re-renders the tab after a structural change (agent added/removed, type changed, default moved). */
+  private refresh(): void {
+    this.display();
+  }
+
   private renderProvider(containerEl: HTMLElement, p: Provider): void {
     const s = this.plugin.settings;
     const save = () => this.plugin.saveSettings();
@@ -175,7 +180,7 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
         b.setButtonText("Set default").onClick(async () => {
           s.defaultProviderId = p.id;
           await save();
-          this.display();
+          this.refresh();
         }),
       );
     }
@@ -197,7 +202,7 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
           s.providers = s.providers.filter((x) => x.id !== p.id);
           if (s.defaultProviderId === p.id) s.defaultProviderId = s.providers[0]?.id ?? "";
           await save();
-          this.display();
+          this.refresh();
         }),
     );
 
@@ -229,7 +234,7 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
             if (p.type === "codex-cli" && !p.command) p.command = PRESETS["codex-cli"].command;
             if (p.type === "acp" && !p.command) p.command = PRESETS.acp.command;
             await save();
-            this.display();
+            this.refresh();
           }),
       );
 
@@ -268,7 +273,7 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
       );
     new Setting(wrap)
       .setName("Model")
-      .setDesc("Alias or id passed to --model: opus, sonnet, haiku, claude-opus-5… Leave empty for the CLI's default.")
+      .setDesc("Alias or ID passed to --model, such as opus, sonnet or a full model ID. Leave empty for the CLI default.")
       .addText((t) =>
         t.setPlaceholder("(CLI default)").setValue(p.model).onChange(async (v) => {
           p.model = v.trim();
@@ -304,7 +309,7 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
     const save = () => this.plugin.saveSettings();
     new Setting(wrap)
       .setName("Agent command")
-      .setDesc("Command line that starts an ACP agent on stdio. Examples: npx -y @agentclientprotocol/claude-agent-acp · gemini --experimental-acp · codex-acp")
+      .setDesc("Command line that starts an ACP agent on stdio. The placeholder is the Claude Code ACP adapter; Gemini CLI and Codex offer ACP modes as well.")
       .addText((t) =>
         t.setPlaceholder("npx -y @agentclientprotocol/claude-agent-acp").setValue(p.command).onChange(async (v) => {
           p.command = v.trim();
@@ -392,7 +397,7 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
 
     new Setting(wrap)
       .setName("Extra headers")
-      .setDesc("Optional. One “Name: value” per line, e.g. X-Hermes-Session-Key: obsidian")
+      .setDesc("Optional. One “name: value” header per line, for example X-Hermes-Session-Key: notes")
       .addTextArea((t) => {
         t.inputEl.rows = 2;
         t.setValue(p.headers).onChange(async (v) => {

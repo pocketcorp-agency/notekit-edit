@@ -1,5 +1,5 @@
 {
-  "name": "obsidianize-edit",
+  "name": "notekit-edit",
   "version": "0.2.0",
   "description": "Select text, tell Claude what to change, and watch it rewrite the passage in place.",
   "main": "main.js",
@@ -43,10 +43,10 @@
   "author": "pocketcorp (https://pocketcorp.agency)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pocketcorp-agency/obsidianize-edit.git"
+    "url": "https://github.com/pocketcorp-agency/notekit-edit.git"
   },
-  "homepage": "https://github.com/pocketcorp-agency/obsidianize-edit#readme",
+  "homepage": "https://github.com/pocketcorp-agency/notekit-edit#readme",
   "bugs": {
-    "url": "https://github.com/pocketcorp-agency/obsidianize-edit/issues"
+    "url": "https://github.com/pocketcorp-agency/notekit-edit/issues"
   }
 }

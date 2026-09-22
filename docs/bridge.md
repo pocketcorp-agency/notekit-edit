@@ -46,14 +46,14 @@ may read and write inside `--cwd`.
 A minimal macOS example:
 
 ```xml
-<!-- ~/Library/LaunchAgents/agency.pocketcorp.obsidianize-bridge.plist -->
+<!-- ~/Library/LaunchAgents/agency.pocketcorp.notekit-bridge.plist -->
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-  <key>Label</key><string>agency.pocketcorp.obsidianize-bridge</string>
+  <key>Label</key><string>agency.pocketcorp.notekit-bridge</string>
   <key>ProgramArguments</key><array>
     <string>/usr/local/bin/node</string>
-    <string>/path/to/obsidianize-edit/bridge/claude-bridge.cjs</string>
+    <string>/path/to/notekit-edit/bridge/claude-bridge.cjs</string>
     <string>--key</string><string>your-secret</string>
   </array>
   <key>RunAtLoad</key><true/>
@@ -61,4 +61,4 @@ A minimal macOS example:
 </dict></plist>
 ```
 
-Load it with `launchctl load ~/Library/LaunchAgents/agency.pocketcorp.obsidianize-bridge.plist`.
+Load it with `launchctl load ~/Library/LaunchAgents/agency.pocketcorp.notekit-bridge.plist`.

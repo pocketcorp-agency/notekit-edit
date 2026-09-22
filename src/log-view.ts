@@ -2,7 +2,7 @@ import { ItemView, setIcon, type WorkspaceLeaf } from "obsidian";
 import type AIInlineEditPlugin from "./main";
 import type { EditRecord } from "./history";
 
-export const LOG_VIEW_TYPE = "obsidianize-edit-log";
+export const LOG_VIEW_TYPE = "notekit-edit-log";
 
 /** Sidebar panel: every AI edit with its instruction, original text, output and reasoning. */
 export class EditLogView extends ItemView {

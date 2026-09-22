@@ -3,7 +3,7 @@ import process from "process";
 import builtins from "builtin-modules";
 
 const banner = `/*
-Obsidianize Edit — Obsidian plugin. Bundled with esbuild; source is in src/.
+Notekit Edit — Obsidian plugin. Bundled with esbuild; source is in src/.
 */`;
 
 const prod = process.argv[2] === "production";
@@ -46,7 +46,7 @@ const bridge = await esbuild.context({
   format: "cjs",
   target: "node18",
   outfile: "bridge/claude-bridge.cjs",
-  banner: { js: "#!/usr/bin/env node\n/* Claude Code / Codex bridge for the Obsidianize Edit Obsidian plugin. Source: src/bridge.ts */" },
+  banner: { js: "#!/usr/bin/env node\n/* Claude Code / Codex bridge for the Notekit Edit Obsidian plugin. Source: src/bridge.ts */" },
   logLevel: "info",
   minify: false,
 });

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Claude Code / Codex bridge for the Obsidianize Edit Obsidian plugin. Source: src/bridge.ts */
+/* Claude Code / Codex bridge for the Notekit Edit Obsidian plugin. Source: src/bridge.ts */
 "use strict";
 
 // src/bridge.ts
@@ -266,7 +266,7 @@ var AcpAgent = class {
     const init = await this.request("initialize", {
       protocolVersion: 1,
       clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false },
-      clientInfo: { name: "obsidianize-edit", title: "Obsidianize Edit", version: "0.2.0" }
+      clientInfo: { name: "notekit-edit", title: "Notekit Edit", version: "0.2.0" }
     });
     this.agentName = init?.agentInfo?.title ?? init?.agentInfo?.name ?? "";
     const methods = init?.authMethods ?? [];

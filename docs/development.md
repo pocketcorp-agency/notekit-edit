@@ -6,8 +6,8 @@ Node 22 (any 18+ works), npm, and Obsidian for manual testing. For the subscript
 Claude Code and/or the Codex CLI logged in.
 
 ```bash
-git clone git@github.com:pocketcorp-agency/obsidianize-edit.git
-cd obsidianize-edit
+git clone git@github.com:pocketcorp-agency/notekit-edit.git
+cd notekit-edit
 npm install
 ```
 
@@ -26,7 +26,7 @@ npm install
 ## Testing in Obsidian
 
 `./deploy.sh "/path/to/vault"` copies `main.js`, `manifest.json` and `styles.css` into
-`<vault>/.obsidian/plugins/obsidianize-edit/`. Reload Obsidian (Cmd/Ctrl+R) to pick up a new build.
+`<vault>/.obsidian/plugins/notekit-edit/`. Reload Obsidian (Cmd/Ctrl+R) to pick up a new build.
 The plugin logs nothing to the console by default; errors are shown in the edits panel.
 
 ## Tests

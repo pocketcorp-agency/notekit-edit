@@ -24,7 +24,7 @@ and, if the instruction is a question rather than an edit, to answer in a `> [!n
 instead of changing the passage.
 
 Add your own standing instructions (style, language, formatting rules) under
-Settings > Obsidianize Edit > Extra instructions.
+Settings > Notekit Edit > Extra instructions.
 
 ## While an edit runs
 

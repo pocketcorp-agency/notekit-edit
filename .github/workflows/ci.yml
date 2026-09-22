@@ -27,7 +27,7 @@ jobs:
       - name: Upload plugin bundle
         uses: actions/upload-artifact@v4
         with:
-          name: obsidianize-edit-${{ github.sha }}
+          name: notekit-edit-${{ github.sha }}
           path: |
             main.js
             manifest.json

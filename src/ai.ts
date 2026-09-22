@@ -182,7 +182,7 @@ async function* streamAcp(
 // ---------------------------------------------------------------------------
 
 function anthropicClient(p: Provider): Anthropic {
-  if (!p.apiKey) throw new Error(`No API key set for “${p.name}”. Add one in Settings → Obsidianize Edit.`);
+  if (!p.apiKey) throw new Error(`No API key set for “${p.name}”. Add one in Settings → Notekit Edit.`);
   // The plugin runs inside Obsidian's renderer/webview, so the SDK sees a browser
   // environment; the API allows direct browser calls when this flag is set.
   return new Anthropic({

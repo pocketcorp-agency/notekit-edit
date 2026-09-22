@@ -1,6 +1,6 @@
 # Agents
 
-An agent is one configured backend. The wizard creates them; Settings > Obsidianize Edit > Agents
+An agent is one configured backend. The wizard creates them; Settings > Notekit Edit > Agents
 lists them as cards where every field can be changed, tested and removed. When several agents exist,
 the prompt box shows a picker.
 

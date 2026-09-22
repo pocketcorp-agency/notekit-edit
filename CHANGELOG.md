@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Obsidianize Edit are documented here. The format follows
+All notable changes to Notekit Edit are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/): MAJOR for breaking changes to settings or behaviour,
 MINOR for new features, PATCH for fixes. Versions are plain `MAJOR.MINOR.PATCH` with no `v` prefix,
@@ -23,7 +23,7 @@ as Obsidian requires.
 - Agent picker in the prompt box when several agents are configured.
 
 ### Changed
-- Renamed from AI Inline Edit to Obsidianize Edit (plugin id `obsidianize-edit`), authored by pocketcorp.
+- Renamed from AI Inline Edit to Notekit Edit (plugin id `notekit-edit`), part of the Notekit suite by pocketcorp.
 - The prompt box only opens from the context menu or the command, no longer on selection.
 - Minimum Obsidian version is 1.7.2.
 
@@ -35,6 +35,6 @@ as Obsidian requires.
 ### Added
 - First version: select text, describe the change in a small prompt box, and the passage is rewritten in place by Claude (Anthropic API key) with a streaming highlight.
 
-[Unreleased]: https://github.com/pocketcorp-agency/obsidianize-edit/compare/0.2.0...HEAD
-[0.2.0]: https://github.com/pocketcorp-agency/obsidianize-edit/compare/0.1.0...0.2.0
-[0.1.0]: https://github.com/pocketcorp-agency/obsidianize-edit/releases/tag/0.1.0
+[Unreleased]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/pocketcorp-agency/notekit-edit/releases/tag/0.1.0

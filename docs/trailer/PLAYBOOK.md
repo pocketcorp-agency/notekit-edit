@@ -1,4 +1,4 @@
-# Obsidianize Edit — trailer playbook & script
+# Notekit Edit — trailer playbook & script
 
 **Format:** 1920×1080, 30 fps, ~55 s, no dialogue (music + on-screen copy), optional VO lines included.
 **Tone:** fast, confident, "watch it happen". Dark Obsidian UI on a deep charcoal void; purple (#a882ff) is the
@@ -40,7 +40,7 @@ The UI frames are rendered from the plugin's own `styles.css`; the streaming/typ
 | 5 | **Your subscription. Or any agent.** *(sub: Claude Code · Codex · API keys · Hermes · Ollama · ACP)* | "Use the Claude or ChatGPT subscription you already pay for — or an API key, a local model, or any agent." |
 | 5b | **Desktop and phone.** *(sub: one bridge, no keys on the phone)* | "On desktop and on your phone." |
 | 6 | **Set up in ten seconds.** | "Set up in ten seconds. No API key needed." |
-| 7 | **Obsidianize Edit** — *Free in Obsidian community plugins* | "Obsidianize Edit. Free, for Obsidian." |
+| 7 | **Notekit Edit** — *Free in Obsidian community plugins* | "Notekit Edit. Free, for Obsidian." |
 
 ---
 
@@ -118,7 +118,7 @@ nothing linear except the shimmer. Motion blur ON for the camera; OFF for UI tex
 - 7.2 zoom-out (camera Z −1500 over 0.6 s) — the cards recede into the void and the logo of S7 fades up.
 
 ### S7 — Outro (3 s)
-- **Obsidianize Edit** wordmark (kinetic: letters settle in from ±20 px), sub **"Free in Obsidian community plugins"**,
+- **Notekit Edit** wordmark (kinetic: letters settle in from ±20 px), sub **"Free in Obsidian community plugins"**,
   GitHub URL. Gentle float (wiggle(0.3, 3)). Fade to black at 2.5 s.
 
 Music: 100–110 bpm, minimal synth pulse with a riser at 0:33 (into S5) and a hit at 0:44. Every cut lands on a beat.
@@ -176,7 +176,7 @@ with the plugin's real `styles.css` (same renderer as `docs/screenshots/`).
 
 ## 7. As built (2026-09-21)
 
-- **Project:** `docs/trailer/ae/Obsidianize-Edit-Trailer.aep` — master comp `TRAILER` (1920×1080, 30 fps, 56 s) with a real
+- **Project:** `docs/trailer/ae/Notekit-Edit-Trailer.aep` — master comp `TRAILER` (1920×1080, 30 fps, 56 s) with a real
   two-node camera, every scene as a 3D card. Scene comps `S0_NOTE … S7_OUTRO`, overlays `OV_MENU_*` / `OV_BOX_*`, and
   precomps `grp_*` / `BADGE` / `TILE` / `MODAL` / `LOGO` are all native, editable layers.
 - **How it was built:** the scene frames were authored as HTML (`ae/gen-scenes.py` → `ae/html/*.html`) and turned into
@@ -187,7 +187,7 @@ with the plugin's real `styles.css` (same renderer as `docs/screenshots/`).
   output from `docs/trailer/outputs/`.
 - **Generated plates:** three Seedance 2.5 image-to-video plates from AE frames (cold open, devices, logo); see
   `ae/media/MANIFEST.md`. The fourth plate (glowing highlight) was generated but not used.
-- **Render:** `aerender` → `ae/renders/Obsidianize-Edit-Trailer.mp4` (H.264, 40 Mbit/s, Best settings).
+- **Render:** `aerender` → `ae/renders/Notekit-Edit-Trailer.mp4` (H.264, 40 Mbit/s, Best settings).
 - **Not done:** music/VO — Higgsfield has no standalone music model, so the cut is silent; drop a 100–110 bpm track
   under it (hits at 0:33 and 0:44) in AE or Premiere.
 
@@ -195,6 +195,6 @@ with the plugin's real `styles.css` (same renderer as `docs/screenshots/`).
 
 - The "Desktop and phone" beat (old S5b) was cut; the compatibility ring now collapses straight into the wizard.
   Total runtime 52 s. `S5B_DEVICES` and its generated plate remain in the project but are not on the timeline.
-- The purple sparkle tile in the compatibility ring and the outro was replaced by the Obsidianize logo card
+- The purple sparkle tile in the compatibility ring and the outro was replaced by the Notekit logo card
   (`docs/media/logo-tile.png`, rounded corners); the outro's generated logo plate is retired.
 - Thumbnail: `docs/media/trailer-thumbnail.png` (1920x1080) and `trailer-thumbnail-1280.jpg`.

@@ -100,7 +100,7 @@ export default class AIInlineEditPlugin extends Plugin {
           this.settings.providers.push(picked);
           this.settings.defaultProviderId = picked.id;
         }
-        new Notice(`Obsidianize Edit will use “${(same ?? picked).name}”.`);
+        new Notice(`Notekit Edit will use “${(same ?? picked).name}”.`);
       }
       this.settings.setupDone = true;
       await this.saveSettings();
@@ -188,7 +188,7 @@ export default class AIInlineEditPlugin extends Plugin {
     const provider = getProvider(this.settings, providerId);
     if (!provider) {
       view.dispatch({ effects: removeJob.of(id) });
-      new Notice("No agent configured. Add one in Settings → Obsidianize Edit.");
+      new Notice("No agent configured. Add one in Settings → Notekit Edit.");
       return;
     }
     const original = view.state.sliceDoc(from, to);

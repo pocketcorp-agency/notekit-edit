@@ -37,7 +37,7 @@ export class SetupWizard extends Modal {
   private render(): void {
     const { contentEl } = this;
     contentEl.empty();
-    this.titleEl.setText("Set up Obsidianize Edit");
+    this.titleEl.setText("Set up Notekit Edit");
     switch (this.step) {
       case 0:
         return this.renderVendor();

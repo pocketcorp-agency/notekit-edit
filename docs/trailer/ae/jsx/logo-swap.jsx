@@ -1,13 +1,13 @@
 $.evalFile(new File("/Users/maidmor/Desktop/obsidian-ai/docs/trailer/ae/jsx/lib.jsx"));
 try {
-  app.beginUndoGroup("Obsidianize logo tile");
+  app.beginUndoGroup("Notekit logo tile");
   // import (or reuse) the rounded logo tile
-  var tileItem = null; for (var i = 1; i <= app.project.numItems; i++) if (app.project.item(i).name === "obsidianize-logo-tile.png") tileItem = app.project.item(i);
-  if (!tileItem) { tileItem = app.project.importFile(new ImportOptions(new File("/Users/maidmor/Desktop/obsidian-ai/docs/media/logo-tile.png"))); tileItem.name = "obsidianize-logo-tile.png"; }
+  var tileItem = null; for (var i = 1; i <= app.project.numItems; i++) if (app.project.item(i).name === "notekit-logo-tile.png") tileItem = app.project.item(i);
+  if (!tileItem) { tileItem = app.project.importFile(new ImportOptions(new File("/Users/maidmor/Desktop/obsidian-ai/docs/media/logo-tile.png"))); tileItem.name = "notekit-logo-tile.png"; }
   function swap(compName, precompName, widthPx) {
     var c = comp(compName); var pre = layerByName(c, precompName).source;
     for (var j = 1; j <= pre.numLayers; j++) pre.layer(j).enabled = false;      // old purple tile + sparkle
-    var L = pre.layers.add(tileItem); L.name = "Obsidianize logo"; var s = widthPx / tileItem.width * 100; L.scale.setValue([s, s]);
+    var L = pre.layers.add(tileItem); L.name = "Notekit logo"; var s = widthPx / tileItem.width * 100; L.scale.setValue([s, s]);
     L.position.setValue([pre.width / 2, pre.height / 2]);
     var sh = L.property("Effects").addProperty("ADBE Drop Shadow"); sh.property("ADBE Drop Shadow-0002").setValue(120); sh.property("ADBE Drop Shadow-0004").setValue(10); sh.property("ADBE Drop Shadow-0005").setValue(40);
     log(compName + ": logo tile placed at " + widthPx + "px");

@@ -36,5 +36,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
-          gh release create "$tag" --title "Obsidianize Edit $tag" --notes-file release-notes.md \
+          gh release create "$tag" --title "Notekit Edit $tag" --notes-file release-notes.md \
             main.js manifest.json styles.css bridge/claude-bridge.cjs

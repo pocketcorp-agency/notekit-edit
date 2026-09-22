@@ -2,7 +2,7 @@
 
 ## Versioning
 
-Obsidianize Edit follows [Semantic Versioning](https://semver.org/):
+Notekit Edit follows [Semantic Versioning](https://semver.org/):
 
 - **MAJOR**: settings or behaviour change in a way that needs user action.
 - **MINOR**: new features, new agent types, new commands.
@@ -53,14 +53,12 @@ The first submission is a pull request to
 
 ```json
 {
-  "id": "obsidianize-edit",
-  "name": "Obsidianize Edit",
+  "id": "notekit-edit",
+  "name": "Notekit Edit",
   "author": "pocketcorp",
   "description": "Select text or place the cursor, tell Claude or Codex what to write or change, and watch it stream into the note. Uses your existing Claude/ChatGPT subscription or an API key.",
-  "repo": "pocketcorp-agency/obsidianize-edit"
+  "repo": "pocketcorp-agency/notekit-edit"
 }
 ```
 
-Later releases only need the tag; Obsidian reads new versions from the GitHub releases. Note that the
-review bot rejects plugin names containing "Obsidian"; "Obsidianize" trips that check, so the listed
-name may have to differ from the product name.
+Later releases only need the tag; Obsidian reads new versions from the GitHub releases.

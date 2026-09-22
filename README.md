@@ -1,20 +1,20 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/media/logo-small-dark.png">
-    <img src="docs/media/logo-small.png" width="448" alt="Obsidianize Edit">
+    <img src="docs/media/logo-small.png" width="448" alt="Notekit Edit">
   </picture>
 </p>
 
 <p align="center">
-  <a href="https://github.com/pocketcorp-agency/obsidianize-edit/actions/workflows/ci.yml"><img src="https://github.com/pocketcorp-agency/obsidianize-edit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/pocketcorp-agency/obsidianize-edit/actions/workflows/release.yml"><img src="https://github.com/pocketcorp-agency/obsidianize-edit/actions/workflows/release.yml/badge.svg" alt="Release"></a>
-  <a href="https://github.com/pocketcorp-agency/obsidianize-edit/releases/latest"><img src="https://img.shields.io/github/v/release/pocketcorp-agency/obsidianize-edit?label=release&color=7f6df2" alt="Latest release"></a>
-  <a href="https://github.com/pocketcorp-agency/obsidianize-edit/releases"><img src="https://img.shields.io/github/downloads/pocketcorp-agency/obsidianize-edit/total?color=7f6df2" alt="Downloads"></a>
+  <a href="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/ci.yml"><img src="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/release.yml"><img src="https://github.com/pocketcorp-agency/notekit-edit/actions/workflows/release.yml/badge.svg" alt="Release"></a>
+  <a href="https://github.com/pocketcorp-agency/notekit-edit/releases/latest"><img src="https://img.shields.io/github/v/release/pocketcorp-agency/notekit-edit?label=release&color=7f6df2" alt="Latest release"></a>
+  <a href="https://github.com/pocketcorp-agency/notekit-edit/releases"><img src="https://img.shields.io/github/downloads/pocketcorp-agency/notekit-edit/total?color=7f6df2" alt="Downloads"></a>
   <a href="manifest.json"><img src="https://img.shields.io/badge/Obsidian-1.7.2%2B-483699" alt="Obsidian 1.7.2 or newer"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/pocketcorp-agency/obsidianize-edit" alt="MIT license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/pocketcorp-agency/notekit-edit" alt="MIT license"></a>
 </p>
 
-Obsidianize Edit is an [Obsidian](https://obsidian.md) plugin that turns any passage of a note into a
+Notekit Edit is an [Obsidian](https://obsidian.md) plugin that turns any passage of a note into a
 prompt: select text, say what should change, and the rewrite streams into the note in place. Put the
 cursor on an empty line instead and it writes there, using the whole note as context. It runs on the
 Claude Pro/Max or ChatGPT subscription you already have (through the Claude Code and Codex CLIs), on an
@@ -24,7 +24,7 @@ Made by [pocketcorp](https://pocketcorp.agency).
 
 ## Trailer
 
-[![Obsidianize Edit trailer](docs/media/trailer-thumbnail-1280.jpg)](docs/media/trailer-preview.mp4)
+[![Notekit Edit trailer](docs/media/trailer-thumbnail-1280.jpg)](docs/media/trailer-preview.mp4)
 
 Watch the [52-second trailer](docs/media/trailer-preview.mp4) (MP4, 960p preview). The two clips below
 are taken from it and show real output from Claude Code and Codex.
@@ -49,9 +49,9 @@ are taken from it and show real output from Claude Code and Codex.
 
 ## Quick start
 
-1. Install from the community plugin list (search for "Obsidianize Edit") or download `main.js`,
-   `manifest.json` and `styles.css` from the [latest release](https://github.com/pocketcorp-agency/obsidianize-edit/releases/latest)
-   into `<vault>/.obsidian/plugins/obsidianize-edit/`, then enable the plugin.
+1. Install from the community plugin list (search for "Notekit Edit") or download `main.js`,
+   `manifest.json` and `styles.css` from the [latest release](https://github.com/pocketcorp-agency/notekit-edit/releases/latest)
+   into `<vault>/.obsidian/plugins/notekit-edit/`, then enable the plugin.
 2. The setup wizard opens: choose Claude or Codex, then subscription or API key. With a subscription
    there is nothing to enter as long as `claude` (or `codex`) is installed and logged in.
 3. Open a note, select some text, right-click and choose **Ask AI to edit selection**.
@@ -83,7 +83,7 @@ The full walkthrough is in [docs/getting-started.md](docs/getting-started.md).
 
 Requests go straight from Obsidian to the agent you configured; there is no intermediate service. The
 whole note is sent as context. API keys and bridge keys are stored in the vault's
-`.obsidian/plugins/obsidianize-edit/data.json`; exclude that file from syncs you do not trust.
+`.obsidian/plugins/notekit-edit/data.json`; exclude that file from syncs you do not trust.
 
 ## License
 

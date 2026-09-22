@@ -2,12 +2,12 @@
 
 ## Install
 
-**Community plugin list.** Settings > Community plugins > Browse, search for "Obsidianize Edit",
+**Community plugin list.** Settings > Community plugins > Browse, search for "Notekit Edit",
 install, enable.
 
 **Manual.** Download `main.js`, `manifest.json` and `styles.css` from the
-[latest release](https://github.com/pocketcorp-agency/obsidianize-edit/releases/latest) into
-`<vault>/.obsidian/plugins/obsidianize-edit/`, reload Obsidian and enable the plugin under
+[latest release](https://github.com/pocketcorp-agency/notekit-edit/releases/latest) into
+`<vault>/.obsidian/plugins/notekit-edit/`, reload Obsidian and enable the plugin under
 Settings > Community plugins.
 
 **From source.** See [development.md](development.md); `npm run deploy` builds and copies the plugin into a vault.
@@ -15,7 +15,7 @@ Settings > Community plugins.
 ## The setup wizard
 
 The wizard opens the first time the plugin is enabled and can be reopened any time from
-Settings > Obsidianize Edit > Relaunch wizard, or with the command *Run setup wizard*.
+Settings > Notekit Edit > Relaunch wizard, or with the command *Run setup wizard*.
 
 1. **Claude or Codex.**
 2. **Subscription or API key.**

@@ -37,5 +37,5 @@ The Claude Code CLI does not emit reasoning text. The Anthropic API agent, Codex
 
 ## Resetting
 
-Delete `<vault>/.obsidian/plugins/obsidianize-edit/data.json` (settings, agents, keys and the edits
+Delete `<vault>/.obsidian/plugins/notekit-edit/data.json` (settings, agents, keys and the edits
 log) and reload Obsidian; the wizard runs again.

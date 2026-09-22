@@ -16,7 +16,7 @@ const today = new Date().toISOString().slice(0, 10);
 let changelog = readFileSync("CHANGELOG.md", "utf8");
 if (!changelog.includes(`## [${targetVersion}]`)) {
   changelog = changelog.replace("## [Unreleased]\n", `## [Unreleased]\n\n## [${targetVersion}] - ${today}\n`);
-  const repo = "https://github.com/pocketcorp-agency/obsidianize-edit";
+  const repo = "https://github.com/pocketcorp-agency/notekit-edit";
   const prev = changelog.match(/\[Unreleased\]: .*compare\/([\d.]+)\.\.\.HEAD/)?.[1];
   changelog = changelog.replace(/\[Unreleased\]: .*\n/, `[Unreleased]: ${repo}/compare/${targetVersion}...HEAD\n[${targetVersion}]: ${repo}/compare/${prev ?? targetVersion}...${targetVersion}\n`);
   writeFileSync("CHANGELOG.md", changelog);

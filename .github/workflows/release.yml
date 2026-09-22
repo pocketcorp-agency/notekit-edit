@@ -1,14 +1,24 @@
 name: Release
 
-# Pushing a tag that is a plain semantic version (e.g. 0.3.0, no "v" prefix, as Obsidian requires)
-# builds the plugin, verifies the tag matches manifest.json, and publishes a GitHub release whose
-# body is the matching CHANGELOG.md section and whose assets are exactly the three files Obsidian
-# downloads: main.js, manifest.json and styles.css. The bridge script is not a plugin asset; it is
-# committed at bridge/claude-bridge.cjs and read from the repository.
+# Publishes a GitHub release whose body is the matching CHANGELOG.md section and whose assets are
+# exactly the three files Obsidian downloads: main.js, manifest.json and styles.css. The bridge script
+# is not a plugin asset; it is committed at bridge/claude-bridge.cjs and read from the repository.
+#
+# Two ways to start it:
+#   - push a tag that is a plain semantic version (e.g. 0.3.0, no "v" prefix, as Obsidian requires);
+#   - run it manually from the Actions tab with the version as input; the workflow then creates the
+#     tag on the chosen branch itself.
+# Either way the tag must equal manifest.json's version and have a CHANGELOG.md section.
 on:
   push:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (plain MAJOR.MINOR.PATCH, must equal manifest.json). The tag is created for you."
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -27,16 +37,28 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Resolve the release tag
+        id: tag
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then tag="$INPUT_VERSION"; else tag="${GITHUB_REF#refs/tags/}"; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Releasing $tag from $GITHUB_SHA"
       - name: Verify tag matches manifest and changelog
         run: npm run check-version
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
       - name: Write release notes from CHANGELOG.md
-        run: node scripts/release-notes.mjs "${{ github.ref_name }}" > release-notes.md
+        env:
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
+        run: node scripts/release-notes.mjs "$RELEASE_TAG" > release-notes.md
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          tag="${GITHUB_REF#refs/tags/}"
-          gh release create "$tag" --title "Notekit Edit $tag" --notes-file release-notes.md \
-            main.js manifest.json styles.css
+          # --target creates the tag at this commit when it does not exist yet (manual runs);
+          # on a tag push the tag already exists and --target is ignored.
+          gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --title "Notekit Edit $RELEASE_TAG" \
+            --notes-file release-notes.md main.js manifest.json styles.css

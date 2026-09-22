@@ -33,6 +33,10 @@ merged; the release step turns that section into the version's section.
    git push --follow-tags
    ```
 
+   If you cannot push tags (for example from an environment whose credentials only allow branch
+   pushes), push the commit, then open **Actions > Release > Run workflow** on GitHub, pick the
+   branch and enter the version. The workflow creates the tag on that commit itself.
+
 4. The **Release** workflow builds the plugin, checks that the tag equals the manifest version and has
    a changelog section, and publishes a GitHub release with exactly `main.js`, `manifest.json` and
    `styles.css` attached, the three files Obsidian downloads. The bridge is not a release asset; it is

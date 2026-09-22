@@ -25,7 +25,7 @@ jobs:
       - run: npm run build
       - run: npm run check-version
       - name: Upload plugin bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: notekit-edit-${{ github.sha }}
           path: |

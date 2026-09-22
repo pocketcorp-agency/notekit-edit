@@ -15,6 +15,7 @@ Everything else in the project is native, editable After Effects (text, shapes, 
 
 ## Agent logos (`logos/`)
 
-Rounded 300 px tiles used in the compatibility scene. Marks from Simple Icons (Claude, Anthropic, Ollama, LM Studio; CC0)
-rendered white on #262626; OpenAI (for Codex), Nous Research (Hermes Agent) and Agent Client Protocol use the
-organisations' public GitHub avatars. Trademarks belong to their owners; they identify the products the plugin works with.
+Rounded 300 px tiles used in the compatibility scene, in the brands' own colours: Claude, Ollama and LM Studio marks from
+Simple Icons (CC0); the OpenAI mark (for Codex) and the Agent Client Protocol avatar from the organisations' public GitHub
+profiles; the Hermes Agent mascot from the Hermes Agent documentation site. Trademarks belong to their owners; they identify
+the products the plugin works with.

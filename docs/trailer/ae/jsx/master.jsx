@@ -11,11 +11,11 @@ try {
   function camAt3(t, x, y, z, dist, inf, outf) { key(CP, t, [x, y, z - dist], inf, outf); key(CI, t, [x, y, z], inf, outf); }
   function place(name, start, dur, z) { var L = M.layers.add(comp(name)); L.name = name; L.threeDLayer = true; L.startTime = start; L.inPoint = start; L.outPoint = start + dur; L.position.setValue([960, 540, z || 0]); L.motionBlur = true; return L; }
   lastStep = "S0 cold open (0–3)";
-  // ---------------- S0 cold open (0–3) ----------------
-  var s0 = place("S0_NOTE", 0, 3.1, 0);
-  camAt(0.0, 1040, 400, 1250, 22, 60); camAt(2.6, 1090, 405, 1080, 60, 22);
-  key(P(s0), 2.65, [960, 540, 0], 22, 90); key(P(s0), 3.0, [-2100, 540, 0], 60, 22);
-  camAt(2.65, 1090, 405, 1080, 22, 85); camAt(3.05, 960, 540, 2664, 80, 22);
+  // ---------------- S0 title card (0–3) ----------------
+  var s0 = place("S0_TITLE", 0, 3.1, 0);
+  camAt(0.0, 960, 560, 2664, 22, 60); camAt(2.6, 960, 560, 2440, 60, 22);                  // slow push-in on the title
+  key(P(s0), 2.65, [960, 540, 0], 22, 90); key(P(s0), 3.0, [-2100, 540, 0], 60, 22);        // whips away
+  camAt(2.65, 960, 560, 2440, 22, 85); camAt(3.05, 960, 540, 2664, 80, 22);
   lastStep = "S1 highlight & edit (3–9.8)";
   // ---------------- S1 highlight & edit (3–9.8) ----------------
   var s1 = place("S1_NOTE_SELECTED", 3.0, 6.8, 0);
@@ -57,8 +57,8 @@ try {
   hold(P(s5), 33.8, [960, 540, 0]); hold(P(s5), 33.83, [968, 534, 0]); hold(P(s5), 33.87, [954, 545, 0]); hold(P(s5), 33.9, [960, 540, 0]);
   // the camera dives onto the first logo as it flies in (S5 local 1.4–2.0 = master 34.95–35.55), rides it to its slot, then pulls back
   camAt(33.6, 960, 540, 2664, 22, 60); camAt(35.0, 960, 540, 2664, 22, 60);
-  camAt(35.2, 420, 900, 1450, 60, 60); camAt(35.4, 396, 705, 1000, 60, 60); camAt(35.58, 390, 650, 920, 60, 22);
-  camAt(36.3, 390, 650, 920, 22, 70); camAt(37.3, 960, 560, 2664, 70, 22);
+  camAt(35.2, 515, 900, 1450, 60, 60); camAt(35.4, 491, 705, 1000, 60, 60); camAt(35.58, 485, 650, 920, 60, 22);
+  camAt(36.3, 485, 650, 920, 22, 70); camAt(37.3, 960, 560, 2664, 70, 22);
   camAt(39.9, 960, 560, 2664, 22, 60); camAt(40.5, 960, 540, 2500, 60, 22);
   key(S(s5), 39.95, [100, 100, 100], 22, 85); key(S(s5), 40.55, [0, 0, 0], 85, 22);
   lastStep = "S6 wizard dolly";

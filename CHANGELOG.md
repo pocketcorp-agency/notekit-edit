@@ -17,7 +17,7 @@ Preparation for the Obsidian community plugin directory.
 - Shorter plugin description in `manifest.json`.
 - The command *Ask AI to edit selection / write at cursor* is now *Ask AI to edit selection or write at cursor*.
 - Settings texts follow Obsidian's sentence-case style; the "no agent" and "no API key" notices point at the plugin settings.
-- The GitHub release now attaches exactly `main.js`, `manifest.json` and `styles.css`; the bridge stays in the repository at `bridge/claude-bridge.cjs`.
+- The GitHub release now attaches exactly `main.js`, `manifest.json` and `styles.css`; the bridge stays in the repository at `bridge/claude-bridge.cjs`. The Release workflow can also be started manually from the Actions tab with a version input, in which case it creates the tag itself.
 - Internal: local agents are gated on `Platform.isDesktopApp` in addition to the lazy Node `require`, the `obsidian` typings are pinned to the minimum app version, and the lint configuration documents every rule it relaxes for the Node bridge code.
 
 ### Fixed

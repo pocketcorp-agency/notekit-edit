@@ -131,7 +131,7 @@ export class AcpAgent {
     const init = (await this.request("initialize", {
       protocolVersion: 1,
       clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false },
-      clientInfo: { name: "obsidian-ai-inline-edit", title: "Obsidian AI Inline Edit", version: "0.2.0" },
+      clientInfo: { name: "obsidianize-edit", title: "Obsidianize Edit", version: "0.2.0" },
     })) as InitializeResult | undefined;
     this.agentName = init?.agentInfo?.title ?? init?.agentInfo?.name ?? "";
     const methods = init?.authMethods ?? [];

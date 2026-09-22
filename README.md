@@ -1,4 +1,6 @@
-# AI Inline Edit — Obsidian plugin
+# Obsidianize Edit — Obsidian plugin
+
+By [pocketcorp](https://pocketcorp.agency).
 
 Select text, tell an AI what to change, and watch the passage get rewritten in place — or put the cursor
 somewhere and have it write there. Uses your **Claude Pro/Max or ChatGPT subscription** through the Claude Code /
@@ -49,7 +51,7 @@ On mobile the prompt box opens as a bottom sheet so it plays nicely with the on-
 ## First run: the setup wizard
 
 When the plugin is enabled for the first time a short wizard opens (re-run it any time via
-*Settings → AI Inline Edit → Relaunch wizard* or the command *Run setup wizard*):
+*Settings → Obsidianize Edit → Relaunch wizard* or the command *Run setup wizard*):
 
 1. **Claude or Codex?**
 2. **Subscription or API key?**
@@ -63,7 +65,7 @@ Out of the box (before the wizard finishes) the plugin already uses local Claude
 ## Agents
 
 The plugin sends edits to whichever **agent** you pick. Add as many as you like under
-*Settings → AI Inline Edit → Agents*; when more than one is configured, the prompt box shows a picker
+*Settings → Obsidianize Edit → Agents*; when more than one is configured, the prompt box shows a picker
 (the last choice sticks as the default). Every agent has a **Test** button.
 
 | Type | What it does | Where it runs |
@@ -116,29 +118,29 @@ prompt asks it not to use them, but treat the key like a password.
 | Extra instructions | — | Appended to the system prompt (style, language, …) |
 | Max output tokens | 16000 | |
 
-API keys are stored in the vault's `.obsidian/plugins/ai-inline-edit/data.json`; don't sync that file to
+API keys are stored in the vault's `.obsidian/plugins/obsidianize-edit/data.json`; don't sync that file to
 places you don't trust.
 
 ## Install
 
 **From the community plugin list** (once accepted): *Settings → Community plugins → Browse*, search for
-“AI Inline Edit”, install and enable.
+“Obsidianize Edit”, install and enable.
 
 **Manually:** download `main.js`, `manifest.json` and `styles.css` from the
-[latest release](../../releases/latest) into `<vault>/.obsidian/plugins/ai-inline-edit/`, reload Obsidian and
+[latest release](../../releases/latest) into `<vault>/.obsidian/plugins/obsidianize-edit/`, reload Obsidian and
 enable the plugin. Or build it yourself and copy `main.js`, `manifest.json` and `styles.css` into
-`<vault>/.obsidian/plugins/ai-inline-edit/`:
+`<vault>/.obsidian/plugins/obsidianize-edit/`:
 
 ```bash
 npm install
 npm run build
 VAULT="/path/to/your/vault"
-mkdir -p "$VAULT/.obsidian/plugins/ai-inline-edit"
-cp main.js manifest.json styles.css "$VAULT/.obsidian/plugins/ai-inline-edit/"
+mkdir -p "$VAULT/.obsidian/plugins/obsidianize-edit"
+cp main.js manifest.json styles.css "$VAULT/.obsidian/plugins/obsidianize-edit/"
 ```
 
-Then reload Obsidian (or toggle the plugin off/on) and enable **AI Inline Edit**.
-For mobile, let Obsidian Sync (or any file sync) carry the `.obsidian/plugins/ai-inline-edit` folder over,
+Then reload Obsidian (or toggle the plugin off/on) and enable **Obsidianize Edit**.
+For mobile, let Obsidian Sync (or any file sync) carry the `.obsidian/plugins/obsidianize-edit` folder over,
 or install it with a plugin such as BRAT.
 
 ## Development

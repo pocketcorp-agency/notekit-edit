@@ -1,5 +1,5 @@
 {
-  "name": "ai-inline-edit",
+  "name": "obsidianize-edit",
   "version": "0.2.0",
   "description": "Select text, tell Claude what to change, and watch it rewrite the passage in place.",
   "main": "main.js",
@@ -35,5 +35,6 @@
   },
   "allowScripts": {
     "esbuild@0.24.2": true
-  }
+  },
+  "author": "pocketcorp (https://pocketcorp.agency)"
 }

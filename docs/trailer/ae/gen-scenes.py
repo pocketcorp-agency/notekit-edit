@@ -230,7 +230,7 @@ def modal(name, title_q, cards, footer_status=""):
     s=[rect(0,0,1920,1080,"#0f0f10",name="void")]
     s.append(f'<div class="modal dialog" style="position:absolute;left:{mx}px;top:{my}px;width:{mw}px;height:{mh}px">'
              + rect(0,0,mw,mh,BORDER,16) + rect(1,1,mw-2,mh-2,BG,15) + icon(XICON,MUTED,20,mw-44,24,fill=BG)
-             + text(36,30,700,"Set up AI Inline Edit",28,TXT,600) + text(36,80,700,title_q,20,MUTED)
+             + text(36,30,700,"Set up Obsidianize Edit",28,TXT,600) + text(36,80,700,title_q,20,MUTED)
              + "".join(cards) + footer_status
              + rect(mw-300,mh-76,110,44,"#333",8)+text(mw-300,mh-64,110,"Back",17,TXT,extra="text-align:center")
              + rect(mw-170,mh-76,134,44,ACCENT,8,name="cta")+text(mw-170,mh-64,134,"Continue",17,"#ffffff",600,extra="text-align:center") + '</div>')
@@ -247,6 +247,6 @@ modal("s6c-wizard-done","Nothing to enter: the plugin runs the Claude Code CLI o
 
 # --- S7 outro -------------------------------------------------------------------------------------
 void_page("s7-outro",[rect(cx-80,300,160,160,ACCENT,40,name="logo-tile"), icon(SPARK,"#ffffff",84,cx-42,338,sw=1.8,fill=ACCENT),
-    text(0,500,1920,"AI Inline Edit",92,"#ffffff",700,extra="text-align:center;letter-spacing:-0.02em",name="wordmark"),
+    text(0,500,1920,"Obsidianize Edit",92,"#ffffff",700,extra="text-align:center;letter-spacing:-0.02em",name="wordmark"),
     text(0,630,1920,"Free in Obsidian community plugins",30,MUTED,extra="text-align:center",name="tagline"),
-    text(0,690,1920,"github.com/…/ai-inline-edit",24,FAINT,extra="text-align:center",name="url")])
+    text(0,690,1920,"by pocketcorp · pocketcorp.agency",24,FAINT,extra="text-align:center",name="url")])

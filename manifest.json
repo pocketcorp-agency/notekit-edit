@@ -1,9 +1,10 @@
 {
-  "id": "ai-inline-edit",
-  "name": "AI Inline Edit",
+  "id": "obsidianize-edit",
+  "name": "Obsidianize Edit",
   "version": "0.2.0",
   "minAppVersion": "1.7.2",
-  "description": "Select text, tell Claude what to change, and watch it rewrite the passage in place. Works on desktop and mobile.",
-  "author": "Jakob Leibetseder",
-  "isDesktopOnly": false
+  "description": "Select text or place the cursor, tell Claude or Codex what to write or change, and watch it stream into the note. Uses your existing Claude/ChatGPT subscription or an API key. Works on desktop and mobile.",
+  "author": "pocketcorp",
+  "isDesktopOnly": false,
+  "authorUrl": "https://pocketcorp.agency"
 }

@@ -1,5 +1,5 @@
 // Minimal stand-in for the `obsidian` module so backend and state-field code can run under Node.
-export const Platform = { isMobile: false, isDesktop: true };
+export const Platform = { isMobile: false, isDesktop: true, isDesktopApp: true, isMobileApp: false };
 export class Plugin {}
 export class PluginSettingTab {}
 export class Modal {}

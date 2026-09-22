@@ -1,5 +1,5 @@
 import { Modal, Platform, setIcon } from "obsidian";
-import type AIInlineEditPlugin from "./main";
+import type NotekitEditPlugin from "./main";
 import { testProvider } from "./ai";
 import { newProvider, type Preset, type Provider } from "./settings";
 
@@ -21,7 +21,7 @@ export class SetupWizard extends Modal {
   private bridgeKey = "";
   private finished = false;
 
-  constructor(private plugin: AIInlineEditPlugin, private onDone: (provider: Provider | null) => void) {
+  constructor(private plugin: NotekitEditPlugin, private onDone: (provider: Provider | null) => void) {
     super(plugin.app);
     this.modalEl.addClass("ai-edit-wizard");
   }
@@ -159,7 +159,7 @@ export class SetupWizard extends Modal {
       const url = contentEl.createEl("input", { type: "url", attr: { placeholder: "http://192.168.1.20:8765/v1" }, cls: "ai-edit-wizard-input" });
       url.value = this.bridgeUrl;
       url.addEventListener("input", () => (this.bridgeUrl = url.value.trim()));
-      const key = contentEl.createEl("input", { type: "password", attr: { placeholder: "bridge key (--key)", autocomplete: "off" }, cls: "ai-edit-wizard-input" });
+      const key = contentEl.createEl("input", { type: "password", attr: { placeholder: "Bridge key (--key)", autocomplete: "off" }, cls: "ai-edit-wizard-input" });
       key.value = this.bridgeKey;
       key.addEventListener("input", () => (this.bridgeKey = key.value.trim()));
       this.nav(contentEl, {

@@ -79,10 +79,7 @@ class CaretWidget extends WidgetType {
     return other.status === this.status;
   }
   toDOM(): HTMLElement {
-    const el = document.createElement("span");
-    el.className = `ai-edit-caret ai-edit-caret-${this.status}`;
-    el.setAttribute("aria-hidden", "true");
-    return el;
+    return createSpan({ cls: `ai-edit-caret ai-edit-caret-${this.status}`, attr: { "aria-hidden": "true" } });
   }
   ignoreEvent(): boolean {
     return true;
@@ -98,9 +95,7 @@ class ProgressWidget extends WidgetType {
     return other.label === this.label;
   }
   toDOM(): HTMLElement {
-    const el = document.createElement("span");
-    el.className = "ai-edit-progress";
-    el.setAttribute("aria-label", `${this.label} is generating`);
+    const el = createSpan({ cls: "ai-edit-progress", attr: { "aria-label": `${this.label} is generating` } });
     el.createSpan({ cls: "ai-edit-spinner" });
     el.createSpan({ cls: "ai-edit-progress-label", text: this.label });
     return el;

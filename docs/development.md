@@ -31,6 +31,9 @@ The plugin logs nothing to the console by default; errors are shown in the edits
 
 ## Tests
 
+The `obsidian` dev dependency is pinned to the version in `manifest.json`'s `minAppVersion`, so the
+type-checker rejects APIs that older Obsidian versions do not have.
+
 `tests/state-field.test.ts` covers the CodeMirror range tracking and output normalisation.
 `tests/backends.test.ts` starts an in-process OpenAI-compatible mock server that mimics Hermes'
 stream, and covers streaming, the CORS fallback, the Test button and settings migration. The CLI, ACP

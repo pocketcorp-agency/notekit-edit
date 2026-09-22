@@ -3,7 +3,7 @@
 ## The prompt box
 
 The prompt box opens from the editor context menu (right-click or long-press) or from the command
-*Ask AI to edit selection / write at cursor*, which you can bind to a hotkey. It never opens on its
+*Ask AI to edit selection or write at cursor*, which you can bind to a hotkey. It never opens on its
 own when you select text.
 
 - With a **selection**, the header shows an excerpt of the selected text and the instruction is
@@ -58,7 +58,7 @@ so its entries show "(none reported by this agent)" under Thinking.
 
 | Command | What it does |
 | --- | --- |
-| Ask AI to edit selection / write at cursor | Opens the prompt box for the current selection or cursor |
+| Ask AI to edit selection or write at cursor | Opens the prompt box for the current selection or cursor |
 | Open AI edits panel | Opens the sidebar log |
 | Cancel running AI edits | Aborts all in-flight edits and restores the original text |
 | Run setup wizard | Reopens the first-run wizard |

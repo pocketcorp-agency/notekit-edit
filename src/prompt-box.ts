@@ -1,6 +1,6 @@
 import { Modal, Platform, setIcon } from "obsidian";
 import type { EditorView } from "@codemirror/view";
-import type AIInlineEditPlugin from "./main";
+import type NotekitEditPlugin from "./main";
 import { getJob, removeJob, setJob } from "./editor-extension";
 import { getProvider } from "./settings";
 
@@ -33,9 +33,14 @@ export class PromptBox {
   };
   private readonly onScroll = () => this.position();
   private readonly onResize = () => this.position();
+  /** The editor's own document/window, so the box works inside popout windows too. */
+  private readonly doc: Document;
+  private readonly win: Window;
 
-  constructor(private plugin: AIInlineEditPlugin, opts: PromptBoxOptions) {
+  constructor(private plugin: NotekitEditPlugin, opts: PromptBoxOptions) {
     this.view = opts.view;
+    this.doc = opts.view.dom.doc;
+    this.win = opts.view.dom.win;
     this.view.dispatch({ effects: setJob.of({ id: this.id, from: opts.from, to: opts.to, status: "target" }) });
 
     if (Platform.isMobile) {
@@ -46,7 +51,7 @@ export class PromptBox {
       this.modal.open();
       this.el = this.modal.contentEl.createDiv({ cls: "ai-edit-box is-mobile" });
     } else {
-      this.el = document.body.createDiv({ cls: "ai-edit-box" });
+      this.el = this.doc.body.createDiv({ cls: "ai-edit-box" });
     }
 
     const header = this.el.createDiv({ cls: "ai-edit-box-header" });
@@ -97,20 +102,20 @@ export class PromptBox {
 
     if (!this.modal) {
       // Deferred so the click/selection that opened the box doesn't immediately close it.
-      window.setTimeout(() => {
+      this.win.setTimeout(() => {
         if (this.closed) return;
-        document.addEventListener("mousedown", this.onDocMouseDown, true);
-        document.addEventListener("touchstart", this.onDocMouseDown as EventListener, true);
+        this.doc.addEventListener("mousedown", this.onDocMouseDown, true);
+        this.doc.addEventListener("touchstart", this.onDocMouseDown as EventListener, true);
       }, 0);
       this.view.scrollDOM.addEventListener("scroll", this.onScroll, { passive: true });
-      window.addEventListener("resize", this.onResize);
+      this.win.addEventListener("resize", this.onResize);
     }
 
     if (opts.focus) this.focus();
   }
 
   get isFocused(): boolean {
-    return document.activeElement === this.textarea;
+    return this.doc.activeElement === this.textarea;
   }
 
   get hasText(): boolean {
@@ -153,8 +158,8 @@ export class PromptBox {
     const r = this.currentRange();
     if (!r) return;
     const pad = 8;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const vw = this.win.innerWidth;
+    const vh = this.win.innerHeight;
     const rect = this.el.getBoundingClientRect();
     const endCoords = this.view.coordsAtPos(r.to) ?? this.view.coordsAtPos(r.from);
     const startCoords = this.view.coordsAtPos(r.from) ?? endCoords;
@@ -195,10 +200,10 @@ export class PromptBox {
   close(refocusEditor = false, keepJob = false): void {
     if (this.closed) return;
     this.closed = true;
-    document.removeEventListener("mousedown", this.onDocMouseDown, true);
-    document.removeEventListener("touchstart", this.onDocMouseDown as EventListener, true);
+    this.doc.removeEventListener("mousedown", this.onDocMouseDown, true);
+    this.doc.removeEventListener("touchstart", this.onDocMouseDown as EventListener, true);
     this.view.scrollDOM.removeEventListener("scroll", this.onScroll);
-    window.removeEventListener("resize", this.onResize);
+    this.win.removeEventListener("resize", this.onResize);
     this.el.remove();
     this.modal?.close();
     if (!keepJob) {

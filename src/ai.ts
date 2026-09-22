@@ -1,10 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { requestUrl } from "obsidian";
+import { Platform, requestUrl } from "obsidian";
 import { AcpAgent } from "./acp";
 import { streamClaudeCli, testClaudeCli } from "./claude-cli";
 import { streamCodexCli, testCodexCli } from "./codex-cli";
 import { canSpawn } from "./process";
-import type { AIInlineEditSettings, Provider } from "./settings";
+import type { NotekitEditSettings, Provider } from "./settings";
 import { type StreamEvent, textEvent, thinkingEvent } from "./stream";
 
 /** Environment the backends need that only the plugin knows. */
@@ -48,7 +48,7 @@ ${COMMON_RULES}
 - Continue naturally from what precedes the cursor and lead into what follows it; include leading/trailing newlines only when the surrounding text needs them.
 - If the instruction is a question, answer it as a callout "> [!note] AI".`;
 
-function buildSystem(settings: AIInlineEditSettings, req: EditRequest): string {
+function buildSystem(settings: NotekitEditSettings, req: EditRequest): string {
   const base = req.selection ? EDIT_PROMPT : INSERT_PROMPT;
   const extra = settings.extraInstructions.trim();
   return extra ? `${base}\n\nAdditional instructions from the user:\n${extra}` : base;
@@ -76,7 +76,7 @@ function buildUserMessage(req: EditRequest): string {
  */
 export function streamEdit(
   provider: Provider,
-  settings: AIInlineEditSettings,
+  settings: NotekitEditSettings,
   ctx: RuntimeContext,
   req: EditRequest,
   signal: AbortSignal,
@@ -105,8 +105,9 @@ export function streamEdit(
   }
 }
 
+/** Local agents spawn processes, which needs Node; that exists only in the desktop (Electron) app. */
 function requireDesktop(p: Provider): void {
-  if (!canSpawn()) {
+  if (!Platform.isDesktopApp || !canSpawn()) {
     throw new Error(`“${p.name}” runs a local process and only works on desktop. On mobile, use a Claude Code bridge or another OpenAI-compatible agent.`);
   }
 }
@@ -182,7 +183,7 @@ async function* streamAcp(
 // ---------------------------------------------------------------------------
 
 function anthropicClient(p: Provider): Anthropic {
-  if (!p.apiKey) throw new Error(`No API key set for “${p.name}”. Add one in Settings → Notekit Edit.`);
+  if (!p.apiKey) throw new Error(`No API key set for “${p.name}”. Add one in the plugin settings.`);
   // The plugin runs inside Obsidian's renderer/webview, so the SDK sees a browser
   // environment; the API allows direct browser calls when this flag is set.
   return new Anthropic({
@@ -196,7 +197,7 @@ function anthropicClient(p: Provider): Anthropic {
 
 async function* streamAnthropic(
   p: Provider,
-  settings: AIInlineEditSettings,
+  settings: NotekitEditSettings,
   system: string,
   user: string,
   signal: AbortSignal,
@@ -264,7 +265,7 @@ function openAIUrl(p: Provider, path: string): string {
 
 async function* streamOpenAICompatible(
   p: Provider,
-  settings: AIInlineEditSettings,
+  settings: NotekitEditSettings,
   system: string,
   user: string,
   signal: AbortSignal,
@@ -283,6 +284,8 @@ async function* streamOpenAICompatible(
 
   let response: Response;
   try {
+    // `fetch` is used on purpose: `requestUrl` cannot stream server-sent events. When the
+    // browser-level request fails (CORS, mixed content) the code below falls back to `requestUrl`.
     response = await fetch(url, { method: "POST", headers: openAIHeaders(p), body: JSON.stringify(body), signal });
   } catch (err) {
     if (signal.aborted) throw err;

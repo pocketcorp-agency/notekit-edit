@@ -8,6 +8,22 @@ as Obsidian requires.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-22
+
+Preparation for the Obsidian community plugin directory.
+
+### Changed
+- README documents what the plugin sends where, which executables it runs, how API keys are stored and that there is no telemetry.
+- Shorter plugin description in `manifest.json`.
+- The command *Ask AI to edit selection / write at cursor* is now *Ask AI to edit selection or write at cursor*.
+- Settings texts follow Obsidian's sentence-case style; the "no agent" and "no API key" notices point at the plugin settings.
+- The GitHub release now attaches exactly `main.js`, `manifest.json` and `styles.css`; the bridge stays in the repository at `bridge/claude-bridge.cjs`.
+- Internal: local agents are gated on `Platform.isDesktopApp` in addition to the lazy Node `require`, the `obsidian` typings are pinned to the minimum app version, and the lint configuration documents every rule it relaxes for the Node bridge code.
+
+### Fixed
+- The prompt box and the in-note highlight timers use the editor's own window and document, so they behave in popout windows.
+- The edits panel cancels its pending render when it is closed.
+
 ## [0.2.0] - 2026-09-22
 
 ### Added
@@ -35,6 +51,7 @@ as Obsidian requires.
 ### Added
 - First version: select text, describe the change in a small prompt box, and the passage is rewritten in place by Claude (Anthropic API key) with a streaming highlight.
 
-[Unreleased]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/pocketcorp-agency/notekit-edit/releases/tag/0.1.0

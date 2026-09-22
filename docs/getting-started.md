@@ -60,5 +60,5 @@ The plugin runs on Obsidian mobile, but a phone cannot run the Claude Code or Co
 - Run the **bridge** on a computer and point the phone at it, so the subscription is used there. The
   wizard's *Subscription* step on mobile asks for the bridge address. See [bridge.md](bridge.md).
 
-To trigger edits comfortably on a phone, add the command *Ask AI to edit selection / write at cursor*
+To trigger edits comfortably on a phone, add the command *Ask AI to edit selection or write at cursor*
 to the mobile toolbar (Settings > Mobile > Manage toolbar options).

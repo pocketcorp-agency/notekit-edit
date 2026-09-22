@@ -43,7 +43,7 @@ function extraPathDirs() {
 }
 function augmentedEnv(extra = {}) {
   const path = nodeRequire("path");
-  const env = { ...process.env };
+  const env = { ...nodeRequire("process").env };
   const current = env.PATH ?? env.Path ?? "";
   const parts = new Set(current.split(path.delimiter).filter(Boolean));
   for (const d of extraPathDirs()) parts.add(d);
@@ -57,7 +57,7 @@ function resolveCommand(command) {
   const path = nodeRequire("path");
   const fs = nodeRequire("fs");
   if (command.includes("/") || command.includes("\\")) return expandHome(command);
-  const exts = process.platform === "win32" ? ["", ".cmd", ".exe", ".bat"] : [""];
+  const exts = nodeRequire("process").platform === "win32" ? ["", ".cmd", ".exe", ".bat"] : [""];
   for (const dir of augmentedEnv().PATH.split(path.delimiter)) {
     for (const ext of exts) {
       const candidate = path.join(dir, command + ext);
@@ -89,7 +89,7 @@ function spawnLineProcess(command, args, opts2 = {}) {
     env: augmentedEnv(opts2.env),
     stdio: ["pipe", "pipe", "pipe"],
     windowsHide: true,
-    shell: process.platform === "win32" && /\.(cmd|bat)$/i.test(resolved)
+    shell: nodeRequire("process").platform === "win32" && /\.(cmd|bat)$/i.test(resolved)
   });
   const lineCbs = [];
   const errCbs = [];
@@ -266,7 +266,7 @@ var AcpAgent = class {
     const init = await this.request("initialize", {
       protocolVersion: 1,
       clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false },
-      clientInfo: { name: "notekit-edit", title: "Notekit Edit", version: "0.2.0" }
+      clientInfo: { name: "notekit-edit", title: "Notekit Edit", version: "0.2.1" }
     });
     this.agentName = init?.agentInfo?.title ?? init?.agentInfo?.name ?? "";
     const methods = init?.authMethods ?? [];

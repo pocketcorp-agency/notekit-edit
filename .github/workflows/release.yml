@@ -2,7 +2,9 @@ name: Release
 
 # Pushing a tag that is a plain semantic version (e.g. 0.3.0, no "v" prefix, as Obsidian requires)
 # builds the plugin, verifies the tag matches manifest.json, and publishes a GitHub release whose
-# body is the matching CHANGELOG.md section and whose assets are the files Obsidian downloads.
+# body is the matching CHANGELOG.md section and whose assets are exactly the three files Obsidian
+# downloads: main.js, manifest.json and styles.css. The bridge script is not a plugin asset; it is
+# committed at bridge/claude-bridge.cjs and read from the repository.
 on:
   push:
     tags:
@@ -37,4 +39,4 @@ jobs:
         run: |
           tag="${GITHUB_REF#refs/tags/}"
           gh release create "$tag" --title "Notekit Edit $tag" --notes-file release-notes.md \
-            main.js manifest.json styles.css bridge/claude-bridge.cjs
+            main.js manifest.json styles.css

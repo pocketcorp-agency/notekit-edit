@@ -10,8 +10,9 @@ Notekit Edit follows [Semantic Versioning](https://semver.org/):
 
 Versions are plain `MAJOR.MINOR.PATCH`, no `v` prefix, because Obsidian matches the git tag against
 `manifest.json` exactly. Three files carry the version and must agree: `package.json`,
-`manifest.json` and `versions.json` (which maps each release to the minimum Obsidian version).
-`npm run check-version` enforces this and runs in CI.
+`manifest.json` and `versions.json` (which maps each release to the minimum Obsidian version); the
+ACP `clientInfo.version` in `src/acp.ts` carries it too. `npm run check-version` enforces this and
+runs in CI.
 
 `CHANGELOG.md` follows Keep a Changelog. Every user-facing change goes under **Unreleased** as it is
 merged; the release step turns that section into the version's section.
@@ -33,8 +34,9 @@ merged; the release step turns that section into the version's section.
    ```
 
 4. The **Release** workflow builds the plugin, checks that the tag equals the manifest version and has
-   a changelog section, and publishes a GitHub release with `main.js`, `manifest.json`, `styles.css`
-   and `bridge/claude-bridge.cjs` attached. Obsidian installs exactly those three plugin files.
+   a changelog section, and publishes a GitHub release with exactly `main.js`, `manifest.json` and
+   `styles.css` attached, the three files Obsidian downloads. The bridge is not a release asset; it is
+   committed as `bridge/claude-bridge.cjs` and used straight from the repository.
 
 If `minAppVersion` changes, edit it in `manifest.json` before bumping so `versions.json` records it.
 
@@ -53,7 +55,7 @@ Submission happens on the Obsidian community site, not through a pull request an
 Before submitting, make sure that:
 
 - the repository is public and has `README.md`, `LICENSE` and `manifest.json` in its root;
-- a GitHub release exists whose tag equals `manifest.json`'s version exactly (`0.2.0`, no `v`), with
+- a GitHub release exists whose tag equals `manifest.json`'s version exactly (`0.2.1`, no `v`), with
   `main.js`, `manifest.json` and `styles.css` attached as individual assets, not a zip;
 - the plugin `id` is unique across the directory and does not contain "obsidian" (`notekit-edit`);
 - `npm run lint` is clean: it runs `eslint-plugin-obsidianmd`, the same guideline rules the reviewers

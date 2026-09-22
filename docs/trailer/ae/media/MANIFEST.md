@@ -12,3 +12,9 @@ Start frames were rendered from the native After Effects scene comps (`ae_export
 
 Everything else in the project is native, editable After Effects (text, shapes, precomps, camera). Fonts: Helvetica Neue
 (HelveticaNeue, -Medium, -Bold) and Menlo — both ship with macOS. No third-party plugins.
+
+## Agent logos (`logos/`)
+
+Rounded 300 px tiles used in the compatibility scene. Marks from Simple Icons (Claude, Anthropic, Ollama, LM Studio; CC0)
+rendered white on #262626; OpenAI (for Codex), Nous Research (Hermes Agent) and Agent Client Protocol use the
+organisations' public GitHub avatars. Trademarks belong to their owners; they identify the products the plugin works with.

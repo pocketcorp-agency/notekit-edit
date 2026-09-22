@@ -3,8 +3,8 @@ try {
   var lastStep = "start"; app.beginUndoGroup("TRAILER master");
   // start clean
   for (var i = app.project.numItems; i >= 1; i--) { var it = app.project.item(i); if (it instanceof CompItem && it.name === "TRAILER") it.remove(); }
-  var M = app.project.items.addComp("TRAILER", 1920, 1080, 1, 52.2, 30); M.bgColor = [0.07, 0.07, 0.078]; M.motionBlur = true; M.shutterAngle = 250; M.motionBlurSamplesPerFrame = 8;
-  var bg = M.layers.addSolid([0.071, 0.071, 0.078], "BG", 1920, 1080, 1, 52.2); bg.name = "BG";
+  var M = app.project.items.addComp("TRAILER", 1920, 1080, 1, 52.75, 30); M.bgColor = [0.07, 0.07, 0.078]; M.motionBlur = true; M.shutterAngle = 250; M.motionBlurSamplesPerFrame = 8;
+  var bg = M.layers.addSolid([0.071, 0.071, 0.078], "BG", 1920, 1080, 1, 52.75); bg.name = "BG";
   var cam = M.layers.addCamera("CAM", [960, 540]); cam.property("ADBE Camera Options Group").property("ADBE Camera Zoom").setValue(2664);
   var CP = cam.property("Position"), CI = cam.pointOfInterest;
   function camAt(t, x, y, dist, inf, outf) { key(CP, t, [x, y, -dist], inf, outf); key(CI, t, [x, y, 0], inf, outf); }
@@ -51,15 +51,19 @@ try {
   s4.anchorPoint.setValue([0, 540, 0]); s4.position.setValue([0, 540, 0]);
   var s4rot = s4.property("ADBE Transform Group").property("ADBE Rotate Y"); key(s4rot, 33.2, 0, 22, 85); key(s4rot, 33.85, -92, 85, 22); lin(O(s4), 33.6, 100); lin(O(s4), 33.9, 0);
   lastStep = "S5 compatibility (33.55–44)";
-  // ---------------- S5 compatibility (33.55–40) ----------------
-  var s5 = place("S5_AGENTS", 33.55, 6.5, 0); s5.moveAfter(s4);
+  // ---------------- S5 compatibility (33.55–40.55) ----------------
+  var s5 = place("S5_AGENTS", 33.55, 7.0, 0); s5.moveAfter(s4);
   key(S(s5), 33.55, [140, 140, 140], 22, 90); key(S(s5), 33.8, [100, 100, 100], 60, 22); lin(O(s5), 33.55, 0); lin(O(s5), 33.7, 100);
   hold(P(s5), 33.8, [960, 540, 0]); hold(P(s5), 33.83, [968, 534, 0]); hold(P(s5), 33.87, [954, 545, 0]); hold(P(s5), 33.9, [960, 540, 0]);
-  camAt(33.6, 960, 540, 2664, 22, 60); camAt(34.3, 760, 520, 2664, 60, 60); camAt(37.2, 1160, 560, 2560, 60, 60); camAt(39.5, 880, 530, 2664, 60, 22);
-  key(S(s5), 39.4, [100, 100, 100], 22, 85); key(S(s5), 40.0, [0, 0, 0], 85, 22);
+  // the camera dives onto the first logo as it flies in (S5 local 1.4–2.0 = master 34.95–35.55), rides it to its slot, then pulls back
+  camAt(33.6, 960, 540, 2664, 22, 60); camAt(35.0, 960, 540, 2664, 22, 60);
+  camAt(35.2, 420, 900, 1450, 60, 60); camAt(35.4, 396, 705, 1000, 60, 60); camAt(35.58, 390, 650, 920, 60, 22);
+  camAt(36.3, 390, 650, 920, 22, 70); camAt(37.3, 960, 560, 2664, 70, 22);
+  camAt(39.9, 960, 560, 2664, 22, 60); camAt(40.5, 960, 540, 2500, 60, 22);
+  key(S(s5), 39.95, [100, 100, 100], 22, 85); key(S(s5), 40.55, [0, 0, 0], 85, 22);
   lastStep = "S6 wizard dolly";
   // ---------------- S6 wizard dolly (39.9–48.1) ----------------
-  var T = 39.9;
+  var T = 40.45;
   var a = place("S6A_WIZARD", T, 8.2, 0), b = place("S6B_WIZARD", T, 8.2, 1000), c = place("S6C_WIZARD", T, 8.2, 2000);
   a.moveAfter(s5); b.moveAfter(a); c.moveAfter(b);   // A in front of B in front of C
   camAt3(T, 960, 540, 0, 2664, 22, 60);
@@ -72,7 +76,7 @@ try {
   // ---------------- S7 outro (47.9–52.2) ----------------
   var s7 = place("S7_OUTRO", T + 8.0, 4.3, 0); lin(O(s7), T + 8.0, 0); lin(O(s7), T + 8.4, 100);
   hold(CP, T + 8.1, [960, 540, -2664]); hold(CI, T + 8.1, [960, 540, 0]);
-  var black = M.layers.addSolid([0, 0, 0], "fade-out", 1920, 1080, 1, 52.2); black.startTime = T + 11.4; black.inPoint = T + 11.5; lin(O(black), T + 11.5, 0); lin(O(black), 52.2, 100);
+  var black = M.layers.addSolid([0, 0, 0], "fade-out", 1920, 1080, 1, 52.75); black.startTime = T + 11.4; black.inPoint = T + 11.5; lin(O(black), T + 11.5, 0); lin(O(black), 52.75, 100);
   cam.moveToBeginning(); black.moveToBeginning();
   app.endUndoGroup(); app.project.save(); log("TRAILER built: " + M.numLayers + " layers, " + M.duration + "s");
 } catch (e) { log("ERROR " + e.toString() + " line " + e.line + " file " + e.fileName + " | last=" + (typeof lastStep !== "undefined" ? lastStep : "?")); }

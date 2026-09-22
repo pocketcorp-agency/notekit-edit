@@ -198,5 +198,5 @@ with the plugin's real `styles.css` (same renderer as `docs/screenshots/`).
 - The purple sparkle tile in the compatibility ring and the outro was replaced by the Notekit logo card
   (`docs/media/logo-tile.png`, rounded corners); the outro's generated logo plate is retired.
 - Thumbnail: `docs/media/trailer-thumbnail.png` (1920x1080) and `trailer-thumbnail-1280.jpg`.
-- 2026-09-22 (later): the selection in S1 is now dragged by the pointer line by line; the S2 to S3 wipe reveals the
+- 2026-09-22 (later): the compatibility scene shows real agent logos flying in under a centred caption, with a camera dive onto the first one; the selection in S1 is now dragged by the pointer line by line; the S2 to S3 wipe reveals the
   new scene left of the bar via a travelling mask (S3 starts under the wipe); the outro shows the wordmark only.

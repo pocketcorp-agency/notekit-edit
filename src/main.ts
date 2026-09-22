@@ -317,7 +317,7 @@ export default class AIInlineEditPlugin extends Plugin {
     const n = this.active.size;
     this.statusEl.toggleClass("is-active", n > 0);
     const name = getProvider(this.settings)?.name ?? "AI";
-    this.statusEl.setText(n === 0 ? "" : n === 1 ? `✦ ${name} editing…` : `✦ ${name} editing (${n})…`);
+    this.statusEl.setText(n === 0 ? "" : n === 1 ? `${name} editing…` : `${name} editing (${n})…`);
   }
 
   private fileNameFor(view: EditorView): string {

@@ -89,7 +89,7 @@ class CaretWidget extends WidgetType {
   }
 }
 
-/** Inline "⟳ Claude Code…" badge shown right after a range that is being generated. */
+/** Inline "Claude Code..." badge with a spinner shown right after a range that is being generated. */
 class ProgressWidget extends WidgetType {
   constructor(private label: string) {
     super();

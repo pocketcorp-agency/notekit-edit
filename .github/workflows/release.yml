@@ -1,26 +1,40 @@
 name: Release
 
+# Pushing a tag that is a plain semantic version (e.g. 0.3.0, no "v" prefix, as Obsidian requires)
+# builds the plugin, verifies the tag matches manifest.json, and publishes a GitHub release whose
+# body is the matching CHANGELOG.md section and whose assets are the files Obsidian downloads.
 on:
   push:
     tags:
-      - "*"
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
       - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
       - run: npm run build
-      - name: Create release with plugin files
+      - name: Verify tag matches manifest and changelog
+        run: npm run check-version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+      - name: Write release notes from CHANGELOG.md
+        run: node scripts/release-notes.mjs "${{ github.ref_name }}" > release-notes.md
+      - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
-          gh release create "$tag" --title "$tag" --generate-notes main.js manifest.json styles.css bridge/claude-bridge.cjs
+          gh release create "$tag" --title "Obsidianize Edit $tag" --notes-file release-notes.md \
+            main.js manifest.json styles.css bridge/claude-bridge.cjs

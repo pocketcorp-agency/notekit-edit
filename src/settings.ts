@@ -183,8 +183,8 @@ export class AIInlineEditSettingTab extends PluginSettingTab {
       b.setButtonText("Test").onClick(() => {
         b.setDisabled(true).setButtonText("Testing…");
         testProvider(p, this.plugin.runtimeContext())
-          .then((msg) => new Notice(`✓ ${p.name}: ${msg}`, 6000))
-          .catch((e: unknown) => new Notice(`✗ ${p.name}: ${e instanceof Error ? e.message : String(e)}`, 8000))
+          .then((msg) => new Notice(`${p.name}: ${msg}`, 6000))
+          .catch((e: unknown) => new Notice(`${p.name}: ${e instanceof Error ? e.message : String(e)}`, 8000))
           .finally(() => b.setDisabled(false).setButtonText("Test"));
       }),
     );

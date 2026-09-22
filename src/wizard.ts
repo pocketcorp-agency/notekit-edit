@@ -191,13 +191,13 @@ export class SetupWizard extends Modal {
     const probe = newProvider(claude ? "claude-code" : "codex-cli");
     testProvider(probe, this.plugin.runtimeContext()).then(
       (msg) => {
-        status.setText(`✓ ${msg}`);
+        status.setText(`${msg}`);
         if (/NOT logged in/.test(msg)) {
           hint.setText(claude ? "Open a terminal, run `claude`, and use /login. Then press Finish." : "Open a terminal and run `codex login`. Then press Finish.");
         }
       },
       (err: Error) => {
-        status.setText(`✗ ${err.message}`);
+        status.setText(`${err.message}`);
         hint.setText(
           claude
             ? "Install Claude Code (npm install -g @anthropic-ai/claude-code), run `claude` once to log in, then press Finish. You can also set the full path to the CLI in the settings."

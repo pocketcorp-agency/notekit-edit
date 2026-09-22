@@ -9,3 +9,4 @@ docs/trailer/ae/renders/render.log
 docs/trailer/ae/*.aep.bak
 docs/trailer/ae/Adobe After Effects Auto-Save/
 docs/trailer/ae/*Protokolle/
+.test-build/

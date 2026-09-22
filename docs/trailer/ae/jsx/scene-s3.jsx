@@ -10,7 +10,7 @@ try {
   var tc = rectLayer(s3, "text-cursor", 2, 26, 561, 515, hex("dadada")); tc.opacity.expression = "time < 4.0 ? ((time*2)%1 < 0.5 ? 100 : 0) : 0";
   caret.opacity.expression = "time < 4.0 || time > 7.3 ? 0 : ((time*1.1)%1 < 0.5 ? 100 : 30)";
   // pointer
-  var cur = pointer(s3, "cursor"); cur.motionBlur = true;
+  var cur = pointer(s3, "cursor"); cur.motionBlur = false;
   moveTo(cur, 0.0, 0.5, [760, 300], [568, 522]);
   // context menu at the click point
   var menuComp = comp("OV_MENU_WRITE"); resetComp(menuComp); var menu = s3.layers.add(menuComp); menu.name = "MENU"; menu.motionBlur = true;

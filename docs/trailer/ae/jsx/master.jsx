@@ -20,8 +20,8 @@ try {
   // ---------------- S1 highlight & edit (3–9.8) ----------------
   var s1 = place("S1_NOTE_SELECTED", 3.0, 6.8, 0);
   key(P(s1), 2.7, [2950, 540, 0], 22, 85); key(P(s1), 3.08, [960, 540, 0], 80, 22);
-  camAt(4.9, 960, 540, 2664, 22, 70); camAt(5.5, 1290, 600, 1750, 70, 22);           // rack-zoom into the menu
-  camAt(5.7, 1290, 600, 1750, 22, 70); camAt(6.3, 960, 540, 2664, 70, 22);           // back out as the prompt box opens
+  camAt(5.1, 960, 540, 2664, 22, 70); camAt(5.7, 1380, 580, 1750, 70, 22);           // rack-zoom into the menu at the pointer
+  camAt(5.95, 1380, 580, 1750, 22, 70); camAt(6.55, 960, 540, 2664, 70, 22);         // back out as the prompt box opens
   key(P(s1), 9.2, [960, 540, 0], 22, 85); key(P(s1), 9.7, [-760, -560, 0], 85, 22);  // flies up-left
   var s1rz = s1.property("ADBE Transform Group").property("ADBE Rotate Z"); key(s1rz, 9.2, 0, 22, 85); key(s1rz, 9.7, -9, 85, 22); key(S(s1), 9.2, [100, 100, 100], 22, 85); key(S(s1), 9.7, [72, 72, 72], 85, 22);
   lastStep = "S2 generating (9.4–18)";
@@ -32,9 +32,13 @@ try {
   camAt(10.0, 960, 540, 2664, 22, 60); camAt(16.5, 990, 520, 2380, 60, 22); camAt(17.0, 990, 520, 2380, 22, 70); camAt(17.6, 960, 540, 2664, 70, 22);
   lastStep = "S3 write at cursor (18–26)";
   // ---------------- S3 write at cursor (18–26) ----------------
-  var s3 = place("S3_WRITE", 18.0, 8.05, 0); s3.inPoint = 17.6;   // enters via wipe
-  var wipe = s3.property("Effects").addProperty("ADBE Linear Wipe"); wipe.property("ADBE Linear Wipe-0002").setValue(270); wipe.property("ADBE Linear Wipe-0003").setValue(0);
-  var wc = wipe.property("ADBE Linear Wipe-0001"); key(wc, 17.6, 100, 22, 60); key(wc, 18.0, 0, 60, 22);
+  var s3 = place("S3_WRITE", 17.6, 8.45, 0);   // starts under the wipe so it is visible left of the bar
+  // reveal S3 through a mask whose right edge travels with the purple bar: left of the bar = new scene, right = old
+  var wm = s3.property("Masks").addProperty("ADBE Mask Atom"); wm.name = "wipe"; var wsh = wm.property("ADBE Mask Shape");
+  function band(x) { var sh = new Shape(); sh.vertices = [[-200, -200], [x, -200], [x, 1280], [-200, 1280]]; sh.closed = true; sh.inTangents = []; sh.outTangents = []; return sh; }
+  var wk1 = wsh.addKey(17.6); wsh.setValueAtKey(wk1, band(-30)); var wk2 = wsh.addKey(18.0); wsh.setValueAtKey(wk2, band(1950));
+  wsh.setTemporalEaseAtKey(wk1, [new KeyframeEase(0, 22)], [new KeyframeEase(0, 60)]); wsh.setTemporalEaseAtKey(wk2, [new KeyframeEase(0, 60)], [new KeyframeEase(0, 22)]);
+  var wk3 = wsh.addKey(18.05); wsh.setValueAtKey(wk3, band(2400));
   var bar = rectLayer(M, "wipe-edge", 70, 1080, -40, 540, hex("a882ff")); bar.startTime = 17.5; bar.inPoint = 17.6; bar.outPoint = 18.05; bar.motionBlur = false;
   key(P(bar), 17.6, [-30, 540], 22, 60); key(P(bar), 18.0, [1950, 540], 60, 22); bar.property("Effects").addProperty("ADBE Glo2");
   CP.expression = "value + ((time > 18.3 && time < 25.3) ? (wiggle(0.45, 6) - value) : [0, 0, 0])";   // handheld drift only during S3

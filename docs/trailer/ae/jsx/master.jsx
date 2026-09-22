@@ -3,8 +3,8 @@ try {
   var lastStep = "start"; app.beginUndoGroup("TRAILER master");
   // start clean
   for (var i = app.project.numItems; i >= 1; i--) { var it = app.project.item(i); if (it instanceof CompItem && it.name === "TRAILER") it.remove(); }
-  var M = app.project.items.addComp("TRAILER", 1920, 1080, 1, 56, 30); M.bgColor = [0.07, 0.07, 0.078]; M.motionBlur = true; M.shutterAngle = 250; M.motionBlurSamplesPerFrame = 8;
-  var bg = M.layers.addSolid([0.071, 0.071, 0.078], "BG", 1920, 1080, 1, 56); bg.name = "BG";
+  var M = app.project.items.addComp("TRAILER", 1920, 1080, 1, 52.2, 30); M.bgColor = [0.07, 0.07, 0.078]; M.motionBlur = true; M.shutterAngle = 250; M.motionBlurSamplesPerFrame = 8;
+  var bg = M.layers.addSolid([0.071, 0.071, 0.078], "BG", 1920, 1080, 1, 52.2); bg.name = "BG";
   var cam = M.layers.addCamera("CAM", [960, 540]); cam.property("ADBE Camera Options Group").property("ADBE Camera Zoom").setValue(2664);
   var CP = cam.property("Position"), CI = cam.pointOfInterest;
   function camAt(t, x, y, dist, inf, outf) { key(CP, t, [x, y, -dist], inf, outf); key(CI, t, [x, y, 0], inf, outf); }
@@ -47,29 +47,28 @@ try {
   s4.anchorPoint.setValue([0, 540, 0]); s4.position.setValue([0, 540, 0]);
   var s4rot = s4.property("ADBE Transform Group").property("ADBE Rotate Y"); key(s4rot, 33.2, 0, 22, 85); key(s4rot, 33.85, -92, 85, 22); lin(O(s4), 33.6, 100); lin(O(s4), 33.9, 0);
   lastStep = "S5 compatibility (33.55–44)";
-  // ---------------- S5 compatibility (33.55–44) ----------------
-  var s5 = place("S5_AGENTS", 33.55, 10.5, 0); s5.moveAfter(s4);
+  // ---------------- S5 compatibility (33.55–40) ----------------
+  var s5 = place("S5_AGENTS", 33.55, 6.5, 0); s5.moveAfter(s4);
   key(S(s5), 33.55, [140, 140, 140], 22, 90); key(S(s5), 33.8, [100, 100, 100], 60, 22); lin(O(s5), 33.55, 0); lin(O(s5), 33.7, 100);
   hold(P(s5), 33.8, [960, 540, 0]); hold(P(s5), 33.83, [968, 534, 0]); hold(P(s5), 33.87, [954, 545, 0]); hold(P(s5), 33.9, [960, 540, 0]);
-  camAt(33.6, 960, 540, 2664, 22, 60); camAt(34.3, 760, 520, 2664, 60, 60); camAt(39.0, 1160, 560, 2560, 60, 60); camAt(43.5, 880, 530, 2664, 60, 22);
-  var s5b = place("S5B_DEVICES", 38.6, 5.45, 0); lin(O(s5b), 38.6, 0); lin(O(s5b), 38.9, 100);
-  var s5cap = layerByName(comp("S5_AGENTS"), "text-27"); lin(O(s5cap), 4.9, 100); lin(O(s5cap), 5.3, 0);   // hand the caption slot to S5B
-  key(S(s5), 43.4, [100, 100, 100], 22, 85); key(S(s5), 44.0, [0, 0, 0], 85, 22); key(S(s5b), 43.4, [100, 100, 100], 22, 85); key(S(s5b), 44.0, [0, 0, 0], 85, 22);
-  lastStep = "S6 wizard dolly (43.9–52)";
-  // ---------------- S6 wizard dolly (43.9–52) ----------------
-  var a = place("S6A_WIZARD", 43.9, 8.2, 0), b = place("S6B_WIZARD", 43.9, 8.2, 1000), c = place("S6C_WIZARD", 43.9, 8.2, 2000);
-  a.moveAfter(s5b); b.moveAfter(a); c.moveAfter(b);   // A in front of B in front of C
-  camAt3(43.9, 960, 540, 0, 2664, 22, 60);
-  camAt3(45.6, 960, 540, 0, 2664, 22, 70); camAt3(46.3, 960, 540, 1000, 2664, 70, 22); lin(O(a), 45.9, 100); lin(O(a), 46.2, 0);
-  camAt3(47.9, 960, 540, 1000, 2664, 22, 70); camAt3(48.6, 960, 540, 2000, 2664, 70, 22); lin(O(b), 48.2, 100); lin(O(b), 48.5, 0);
-  camAt3(51.3, 960, 540, 2000, 2664, 22, 80); camAt3(52.0, 960, 540, 2000, 4200, 80, 22); lin(O(c), 51.5, 100); lin(O(c), 52.0, 0);
-  // S6B/S6C local clocks: they start at 43.9 but are seen later — shift their start so entrances play when the camera arrives
-  b.startTime = 45.9; b.inPoint = 45.9; b.outPoint = 52.1; c.startTime = 48.2; c.inPoint = 48.2; c.outPoint = 52.1;
-  lastStep = "S7 outro (52–56)";
-  // ---------------- S7 outro (52–56) ----------------
-  var s7 = place("S7_OUTRO", 51.9, 4.1, 0); lin(O(s7), 51.9, 0); lin(O(s7), 52.3, 100);
-  hold(CP, 52.0, [960, 540, -2664]); hold(CI, 52.0, [960, 540, 0]);
-  var black = M.layers.addSolid([0, 0, 0], "fade-out", 1920, 1080, 1, 56); black.startTime = 55.2; black.inPoint = 55.3; lin(O(black), 55.3, 0); lin(O(black), 56.0, 100);
+  camAt(33.6, 960, 540, 2664, 22, 60); camAt(34.3, 760, 520, 2664, 60, 60); camAt(37.2, 1160, 560, 2560, 60, 60); camAt(39.5, 880, 530, 2664, 60, 22);
+  key(S(s5), 39.4, [100, 100, 100], 22, 85); key(S(s5), 40.0, [0, 0, 0], 85, 22);
+  lastStep = "S6 wizard dolly";
+  // ---------------- S6 wizard dolly (39.9–48.1) ----------------
+  var T = 39.9;
+  var a = place("S6A_WIZARD", T, 8.2, 0), b = place("S6B_WIZARD", T, 8.2, 1000), c = place("S6C_WIZARD", T, 8.2, 2000);
+  a.moveAfter(s5); b.moveAfter(a); c.moveAfter(b);   // A in front of B in front of C
+  camAt3(T, 960, 540, 0, 2664, 22, 60);
+  camAt3(T + 1.7, 960, 540, 0, 2664, 22, 70); camAt3(T + 2.4, 960, 540, 1000, 2664, 70, 22); lin(O(a), T + 2.0, 100); lin(O(a), T + 2.3, 0);
+  camAt3(T + 4.0, 960, 540, 1000, 2664, 22, 70); camAt3(T + 4.7, 960, 540, 2000, 2664, 70, 22); lin(O(b), T + 4.3, 100); lin(O(b), T + 4.6, 0);
+  camAt3(T + 7.4, 960, 540, 2000, 2664, 22, 80); camAt3(T + 8.1, 960, 540, 2000, 4200, 80, 22); lin(O(c), T + 7.6, 100); lin(O(c), T + 8.1, 0);
+  // S6B/S6C local clocks: shift their start so entrances play when the camera arrives
+  b.startTime = T + 2.0; b.inPoint = T + 2.0; b.outPoint = T + 8.2; c.startTime = T + 4.3; c.inPoint = T + 4.3; c.outPoint = T + 8.2;
+  lastStep = "S7 outro";
+  // ---------------- S7 outro (47.9–52.2) ----------------
+  var s7 = place("S7_OUTRO", T + 8.0, 4.3, 0); lin(O(s7), T + 8.0, 0); lin(O(s7), T + 8.4, 100);
+  hold(CP, T + 8.1, [960, 540, -2664]); hold(CI, T + 8.1, [960, 540, 0]);
+  var black = M.layers.addSolid([0, 0, 0], "fade-out", 1920, 1080, 1, 52.2); black.startTime = T + 11.4; black.inPoint = T + 11.5; lin(O(black), T + 11.5, 0); lin(O(black), 52.2, 100);
   cam.moveToBeginning(); black.moveToBeginning();
   app.endUndoGroup(); app.project.save(); log("TRAILER built: " + M.numLayers + " layers, " + M.duration + "s");
 } catch (e) { log("ERROR " + e.toString() + " line " + e.line + " file " + e.fileName + " | last=" + (typeof lastStep !== "undefined" ? lastStep : "?")); }

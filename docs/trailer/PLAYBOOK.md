@@ -22,7 +22,7 @@ The UI frames are rendered from the plugin's own `styles.css`; the streaming/typ
 | 2 | 0:10–0:18 | **Generation** — highlighted range with shimmer + "⟳ Claude Code" badge; text streams in, badge disappears, green flash | Subtle orbit around the note (3D card tilt 6°), then dolly-in on the new bullet list | Vertical wipe (purple edge) → S3 |
 | 3 | 0:18–0:26 | **Write at cursor** — empty line under "Packing list", context menu "Ask AI to write here", pulsing caret, list types itself in | Handheld-ish drift; punch-in at the caret; pull back as the list fills | Card zooms *through* the camera → S4 |
 | 4 | 0:26–0:34 | **Edits panel** — sidebar slides in; entry expands to Original / Output / Thinking | Camera pans right with the panel; slow tilt down along the expanded card | Panel folds away (3D rotation on Y), title card slams in → S5 |
-| 5 | 0:34–0:44 | **Compatibility** — grid of agent logos/names orbiting the plugin icon: Claude Code (subscription), Codex, Anthropic API, OpenAI, Hermes Agent, Ollama, ACP agents; then phone + laptop with the bridge line drawn between them | Continuous orbit; each name flies in on its own vector and locks; phone/laptop slide in from opposite sides | Everything collapses to a point → S6 |
+| 5 | 0:34–0:40 | **Compatibility** — grid of agent logos/names orbiting the plugin icon: Claude Code (subscription), Codex, Anthropic API, OpenAI, Hermes Agent, Ollama, ACP agents; then phone + laptop with the bridge line drawn between them | Continuous orbit; each name flies in on its own vector and locks; phone/laptop slide in from opposite sides | Everything collapses to a point → S6 |
 | 6 | 0:44–0:52 | **Setup wizard** — "Claude / Codex" → "Subscription / API key" → ✓ logged in | Quick 3-step dolly through the modal (three cards in depth) | Zoom out to logo |
 | 7 | 0:52–0:55 | **Outro** — plugin name, "Free · Obsidian community plugins", GitHub URL | Logo settles, gentle float | Fade to black |
 
@@ -190,3 +190,11 @@ with the plugin's real `styles.css` (same renderer as `docs/screenshots/`).
 - **Render:** `aerender` → `ae/renders/Obsidianize-Edit-Trailer.mp4` (H.264, 40 Mbit/s, Best settings).
 - **Not done:** music/VO — Higgsfield has no standalone music model, so the cut is silent; drop a 100–110 bpm track
   under it (hits at 0:33 and 0:44) in AE or Premiere.
+
+### Revisions (2026-09-22)
+
+- The "Desktop and phone" beat (old S5b) was cut; the compatibility ring now collapses straight into the wizard.
+  Total runtime 52 s. `S5B_DEVICES` and its generated plate remain in the project but are not on the timeline.
+- The purple sparkle tile in the compatibility ring and the outro was replaced by the Obsidianize logo card
+  (`docs/media/logo-tile.png`, rounded corners); the outro's generated logo plate is retired.
+- Thumbnail: `docs/media/trailer-thumbnail.png` (1920x1080) and `trailer-thumbnail-1280.jpg`.

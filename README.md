@@ -24,9 +24,9 @@ Made by [pocketcorp](https://pocketcorp.agency).
 
 ## Trailer
 
-[![Obsidianize Edit trailer](docs/media/trailer-poster.jpg)](docs/media/trailer-preview.mp4)
+[![Obsidianize Edit trailer](docs/media/trailer-thumbnail-1280.jpg)](docs/media/trailer-preview.mp4)
 
-Watch the [56-second trailer](docs/media/trailer-preview.mp4) (MP4, 960p preview). The two clips below
+Watch the [52-second trailer](docs/media/trailer-preview.mp4) (MP4, 960p preview). The two clips below
 are taken from it and show real output from Claude Code and Codex.
 
 | Edit a selection | Write at the cursor |

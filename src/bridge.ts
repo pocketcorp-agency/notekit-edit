@@ -5,11 +5,12 @@
  *
  *   node bridge/claude-bridge.cjs --key <secret> [--port 8765] [--host 0.0.0.0]
  *        [--backend claude|codex|acp] [--acp-command "npx -y @agentclientprotocol/claude-agent-acp"]
- *        [--cwd /path/for/agent] [--allow-tools] [--public-url URL] [--no-qr]
+ *        [--cwd /path/for/agent] [--allow-tools] [--public-url URL] [--no-qr] [--key-file PATH] [--pair]
  *
  * Endpoints: GET /v1/models, POST /v1/chat/completions (stream: true → SSE), GET /health
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { readFileSync } from "node:fs";
 import { homedir, networkInterfaces } from "node:os";
 import { AcpAgent } from "./acp";
 import { renderQr } from "./qr-terminal";
@@ -34,6 +35,8 @@ interface Options {
   publicUrl: string;
   /** Print the setup link and QR code on start. */
   qr: boolean;
+  /** Only print the setup link and QR code, then exit (used by `npm run bridge:setup` for a running service). */
+  pair: boolean;
 }
 
 function parseArgs(argv: string[]): Options {
@@ -49,6 +52,7 @@ function parseArgs(argv: string[]): Options {
     codexCommand: "codex",
     publicUrl: "",
     qr: true,
+    pair: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -65,14 +69,25 @@ function parseArgs(argv: string[]): Options {
       case "--codex-command": o.codexCommand = v(); break;
       case "--public-url": o.publicUrl = v().replace(/\/+$/, ""); break;
       case "--no-qr": o.qr = false; break;
+      case "--pair": o.pair = true; break;
+      case "--key-file": {
+        const file = v();
+        try {
+          o.key = readFileSync(file, "utf8").trim();
+        } catch (e) {
+          console.error(`Cannot read --key-file ${file}: ${(e as Error).message}`);
+          process.exit(1);
+        }
+        break;
+      }
       case "-h":
       case "--help":
-        console.log("Usage: node claude-bridge.cjs --key <secret> [--port 8765] [--host 0.0.0.0] [--backend claude|codex|acp] [--acp-command CMD] [--cwd DIR] [--allow-tools] [--public-url URL] [--no-qr]");
+        console.log("Usage: node claude-bridge.cjs --key <secret> | --key-file <path> [--port 8765] [--host 0.0.0.0] [--backend claude|codex|acp] [--acp-command CMD] [--cwd DIR] [--allow-tools] [--public-url URL] [--no-qr] [--pair]");
         process.exit(0);
     }
   }
   if (!o.key) {
-    console.error("Refusing to start without --key (or BRIDGE_KEY): anyone on the network could otherwise use your subscription.");
+    console.error("Refusing to start without --key, --key-file or BRIDGE_KEY: anyone on the network could otherwise use your subscription.");
     process.exit(1);
   }
   return o;
@@ -223,7 +238,13 @@ function printSetupLinks(): void {
     out.write("\nOther addresses of this computer, if the phone cannot reach the one above:\n");
     for (const l of links.slice(1)) out.write(`${l}\n`);
   }
-  out.write("\nWrong address? Restart with --public-url http://<reachable-host>:" + opts.port + "/v1. Hide this with --no-qr.\n\n");
+  out.write(`\nWrong address? Use --public-url http://<reachable-host>:${opts.port}/v1.${opts.pair ? "" : " Hide this with --no-qr."}\n\n`);
+}
+
+if (opts.pair) {
+  // Pairing only: print the QR code for a bridge that is already running (for example as a service).
+  printSetupLinks();
+  process.exit(0);
 }
 
 server.listen(opts.port, opts.host, () => {
@@ -232,8 +253,11 @@ server.listen(opts.port, opts.host, () => {
   if (opts.qr) printSetupLinks();
 });
 
-process.on("SIGINT", () => {
-  acp?.shutdown();
-  server.close();
-  process.exit(0);
-});
+// SIGINT from Ctrl+C, SIGTERM from launchd/systemd when the service stops.
+for (const sig of ["SIGINT", "SIGTERM"] as const) {
+  process.on(sig, () => {
+    acp?.shutdown();
+    server.close();
+    process.exit(0);
+  });
+}

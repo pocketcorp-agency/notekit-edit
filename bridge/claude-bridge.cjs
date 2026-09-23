@@ -4,6 +4,7 @@
 
 // src/bridge.ts
 var import_node_http = require("node:http");
+var import_node_fs = require("node:fs");
 var import_node_os = require("node:os");
 
 // src/process.ts
@@ -2161,7 +2162,8 @@ function parseArgs(argv) {
     claudeCommand: "claude",
     codexCommand: "codex",
     publicUrl: "",
-    qr: true
+    qr: true,
+    pair: false
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -2200,14 +2202,27 @@ function parseArgs(argv) {
       case "--no-qr":
         o.qr = false;
         break;
+      case "--pair":
+        o.pair = true;
+        break;
+      case "--key-file": {
+        const file = v();
+        try {
+          o.key = (0, import_node_fs.readFileSync)(file, "utf8").trim();
+        } catch (e) {
+          console.error(`Cannot read --key-file ${file}: ${e.message}`);
+          process.exit(1);
+        }
+        break;
+      }
       case "-h":
       case "--help":
-        console.log("Usage: node claude-bridge.cjs --key <secret> [--port 8765] [--host 0.0.0.0] [--backend claude|codex|acp] [--acp-command CMD] [--cwd DIR] [--allow-tools] [--public-url URL] [--no-qr]");
+        console.log("Usage: node claude-bridge.cjs --key <secret> | --key-file <path> [--port 8765] [--host 0.0.0.0] [--backend claude|codex|acp] [--acp-command CMD] [--cwd DIR] [--allow-tools] [--public-url URL] [--no-qr] [--pair]");
         process.exit(0);
     }
   }
   if (!o.key) {
-    console.error("Refusing to start without --key (or BRIDGE_KEY): anyone on the network could otherwise use your subscription.");
+    console.error("Refusing to start without --key, --key-file or BRIDGE_KEY: anyone on the network could otherwise use your subscription.");
     process.exit(1);
   }
   return o;
@@ -2353,15 +2368,24 @@ ${links[0]}
     for (const l of links.slice(1)) out.write(`${l}
 `);
   }
-  out.write("\nWrong address? Restart with --public-url http://<reachable-host>:" + opts.port + "/v1. Hide this with --no-qr.\n\n");
+  out.write(`
+Wrong address? Use --public-url http://<reachable-host>:${opts.port}/v1.${opts.pair ? "" : " Hide this with --no-qr."}
+
+`);
+}
+if (opts.pair) {
+  printSetupLinks();
+  process.exit(0);
 }
 server.listen(opts.port, opts.host, () => {
   log(`listening on http://${opts.host}:${opts.port}/v1 (backend: ${opts.backend}, cwd: ${opts.cwd})`);
   log(`In Obsidian: add an "OpenAI-compatible" agent with base URL http://<this-machine>:${opts.port}/v1, the --key as API key, model "${MODEL}".`);
   if (opts.qr) printSetupLinks();
 });
-process.on("SIGINT", () => {
-  acp?.shutdown();
-  server.close();
-  process.exit(0);
-});
+for (const sig of ["SIGINT", "SIGTERM"]) {
+  process.on(sig, () => {
+    acp?.shutdown();
+    server.close();
+    process.exit(0);
+  });
+}

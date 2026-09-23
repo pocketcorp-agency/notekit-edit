@@ -78,7 +78,9 @@ The full walkthrough is in [docs/getting-started.md](docs/getting-started.md).
 - Obsidian 1.7.2 or newer (desktop and mobile).
 - For subscription use on desktop: [Claude Code](https://docs.claude.com/en/docs/claude-code) (`claude`)
   and/or the [Codex CLI](https://developers.openai.com/codex/cli) (`codex`), logged in.
-- For mobile subscription use: a computer running the bridge (Node 18 or newer).
+- For mobile subscription use: a computer running the bridge (Node 18 or newer). From a clone of
+  this repository, `npm install && npm run build && npm run bridge:setup -- --install` sets it up and
+  shows the QR code for the phone; see [docs/bridge.md](docs/bridge.md).
 - An account with the AI provider you choose: a Claude or ChatGPT subscription, or an Anthropic or
   OpenAI API key (pay per use), or your own OpenAI-compatible server.
 

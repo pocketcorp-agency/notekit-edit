@@ -11,6 +11,8 @@ as Obsidian requires.
 ### Added
 - Set up an agent by scanning a QR code: the bridge prints a QR code and an `obsidian://notekit-edit` setup link when it starts; the phone's camera opens Obsidian, which confirms and adds the agent. New bridge options `--public-url` and `--no-qr`.
 - Settings > **Import setup link** accepts the same link pasted as text.
+- `npm run bridge:setup` sets up the bridge in one command: checks the CLI login, keeps a random key in `~/.config/notekit-bridge/key`, prints the pairing QR code, and with `--install` runs the bridge in the background at login (launchd on macOS, systemd on Linux). `--pair` shows the QR code again, `--uninstall` removes the service.
+- Bridge options `--key-file` (read the key from a file, keeping it out of the process list) and `--pair` (print the setup QR code and exit); the bridge also stops cleanly on SIGTERM.
 - The setup-link format is documented in `docs/setup-links.md` so other software can generate compatible QR codes. Links can only describe OpenAI-compatible and Anthropic agents, never local agents or commands.
 
 ## [0.2.1] - 2026-09-22

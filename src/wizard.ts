@@ -156,6 +156,10 @@ export class SetupWizard extends Modal {
           `Obsidian on a phone can't run ${claude ? "Claude Code" : "Codex"} itself. Run the plugin's bridge on a computer where you're logged in ` +
           "(see the README: `node bridge/claude-bridge.cjs --key …`) and enter its address here. You can also skip this and add an agent later.",
       });
+      contentEl.createEl("p", {
+        cls: "ai-edit-wizard-hint",
+        text: "Easiest: start the bridge on your computer and scan the QR code it prints with this phone's camera. That fills everything in for you.",
+      });
       const url = contentEl.createEl("input", { type: "url", attr: { placeholder: "http://192.168.1.20:8765/v1" }, cls: "ai-edit-wizard-input" });
       url.value = this.bridgeUrl;
       url.addEventListener("input", () => (this.bridgeUrl = url.value.trim()));

@@ -8,6 +8,11 @@ as Obsidian requires.
 
 ## [Unreleased]
 
+### Added
+- Set up an agent by scanning a QR code: the bridge prints a QR code and an `obsidian://notekit-edit` setup link when it starts; the phone's camera opens Obsidian, which confirms and adds the agent. New bridge options `--public-url` and `--no-qr`.
+- Settings > **Import setup link** accepts the same link pasted as text.
+- The setup-link format is documented in `docs/setup-links.md` so other software can generate compatible QR codes. Links can only describe OpenAI-compatible and Anthropic agents, never local agents or commands.
+
 ## [0.2.1] - 2026-09-22
 
 Preparation for the Obsidian community plugin directory.

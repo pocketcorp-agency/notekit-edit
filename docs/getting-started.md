@@ -57,8 +57,10 @@ cursor. See [usage.md](usage.md) for everything else.
 The plugin runs on Obsidian mobile, but a phone cannot run the Claude Code or Codex CLI. Two options:
 
 - Use an **API key** agent (Anthropic or OpenAI).
-- Run the **bridge** on a computer and point the phone at it, so the subscription is used there. The
-  wizard's *Subscription* step on mobile asks for the bridge address. See [bridge.md](bridge.md).
+- Run the **bridge** on a computer and point the phone at it, so the subscription is used there.
+  The bridge prints a QR code when it starts; scan it with the phone's camera and confirm in
+  Obsidian, and the agent is set up. The wizard's *Subscription* step on mobile also accepts the
+  address by hand. See [bridge.md](bridge.md) and [setup-links.md](setup-links.md).
 
 To trigger edits comfortably on a phone, add the command *Ask AI to edit selection or write at cursor*
 to the mobile toolbar (Settings > Mobile > Manage toolbar options).

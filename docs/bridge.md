@@ -15,8 +15,9 @@ node bridge/claude-bridge.cjs --key <secret> --backend acp \
 ```
 
 Options: `--port` (8765), `--host` (0.0.0.0), `--cwd` (working directory for the agent, defaults to
-the home directory), `--allow-tools` (ACP only), `--claude-command`, `--codex-command`. The key can
-also come from the `BRIDGE_KEY` environment variable. The bridge refuses to start without a key.
+the home directory), `--allow-tools` (ACP only), `--claude-command`, `--codex-command`,
+`--public-url` (the base URL phones should use, see below) and `--no-qr`. The key can also come from
+the `BRIDGE_KEY` environment variable. The bridge refuses to start without a key.
 
 Endpoints: `GET /v1/models`, `POST /v1/chat/completions` (with `stream: true` for SSE, thinking is
 forwarded as `reasoning_content`), `GET /health`. CORS headers are sent, so Obsidian can stream from it
@@ -24,7 +25,22 @@ directly.
 
 ## Use it from Obsidian
 
-Add an agent of type OpenAI-compatible (the wizard's *Subscription* choice on mobile does this, or
+**Scan the QR code.** When it starts in a terminal, the bridge prints a QR code and a setup link for
+this computer's local address. Scan the code with the phone's camera app: it opens Obsidian, which
+shows the agent it is about to add; confirm with **Add agent**. The link below the code can also be
+pasted under Settings > Notekit Edit > **Import setup link**. The format is documented in
+[setup-links.md](setup-links.md).
+
+The bridge guesses the address by preferring private network ranges (`192.168.*`, `10.*`,
+`172.16-31.*`, then Tailscale's `100.64-127.*`) and lists the other addresses underneath. If the phone
+reaches the computer by another name, for example over a VPN or a reverse proxy with TLS, start it with
+`--public-url https://bridge.example.ts.net/v1`. When the output is not a terminal (launchd, a log
+file) only the link is printed.
+
+The QR code contains the bridge key. Anyone who sees it can use your subscription through the bridge,
+so do not share screenshots of it.
+
+**Or enter it by hand.** Add an agent of type OpenAI-compatible (the wizard's *Subscription* choice on mobile does this, or
 change a card's type on desktop):
 
 - base URL `http://<computer-ip>:8765/v1`

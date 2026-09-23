@@ -13,9 +13,9 @@ export default tseslint.config(
         {
           // Product names and acronyms that appear in UI text and keep their capitalisation.
           brands: ["Notekit Edit", "Notekit", "Claude Code", "Claude", "Codex", "Anthropic", "OpenAI", "ChatGPT", "Hermes", "Ollama", "Gemini", "Haiku", "Obsidian", "British English"],
-          acronyms: ["ACP", "AI", "API", "CLI", "ID", "URL"],
+          acronyms: ["ACP", "AI", "API", "CLI", "ID", "QR", "URL", "VPN"],
           // Placeholders that are literal commands or URLs, not prose.
-          ignoreRegex: ["^(claude|codex)$", "^npx ", "^https?://"],
+          ignoreRegex: ["^(claude|codex)$", "^npx ", "^https?://", "^obsidian://"],
         },
       ],
     },

@@ -54,6 +54,12 @@ The ribbon icon (or the command *Open AI edits panel*) opens a sidebar listing e
 The last 50 edits persist across restarts. The Claude Code CLI currently does not emit reasoning text,
 so its entries show "(none reported by this agent)" under Thinking.
 
+## Setup links
+
+An `obsidian://notekit-edit?…` link, usually from the QR code the bridge prints, adds or updates an
+agent after a confirmation dialog. Settings > Notekit Edit > **Import setup link** takes a pasted link.
+See [setup-links.md](setup-links.md).
+
 ## Commands
 
 | Command | What it does |

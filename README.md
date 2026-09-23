@@ -42,7 +42,8 @@ Watch the [full trailer](docs/media/trailer-preview.mp4) (MP4, 960p preview).
   CLI and reuses its login. Codex works the same way with the ChatGPT login.
 - **Any other agent.** Anthropic or OpenAI API keys, OpenAI-compatible servers (Hermes Agent, Ollama,
   LM Studio, OpenRouter, vLLM), and Agent Client Protocol agents over stdio.
-- **Desktop and mobile.** Phones use the bundled bridge to reach a subscription on a computer.
+- **Desktop and mobile.** Phones use the bundled bridge to reach a subscription on a computer; scan
+  the QR code the bridge prints and the phone is set up.
 - **Transparent.** A sidebar panel logs every edit with the original text, the exact output, the
   model's reasoning where the agent exposes it, and errors.
 
@@ -64,6 +65,7 @@ The full walkthrough is in [docs/getting-started.md](docs/getting-started.md).
 | [Getting started](docs/getting-started.md) | Installation, the setup wizard, first edit, mobile |
 | [Agents](docs/agents.md) | Claude Code, Codex, API keys, ACP agents, OpenAI-compatible servers, Hermes |
 | [Bridge](docs/bridge.md) | Using a subscription from a phone or another computer |
+| [Setup links](docs/setup-links.md) | Setting up an agent from a QR code; the link format for your own generators |
 | [Usage](docs/usage.md) | Prompt box, cursor mode, the edits panel, commands, settings |
 | [Troubleshooting](docs/troubleshooting.md) | Common errors and how to read the edits panel |
 | [Architecture](docs/architecture.md) | How the editor extension, backends and bridge fit together |
@@ -120,6 +122,11 @@ text in the vault's `.obsidian/plugins/notekit-edit/data.json`, together with th
 configuration and the last 50 entries of the edits panel (instruction, original text, output and
 reasoning). Exclude that file from syncs or backups you do not trust, and remember that vault sync
 services copy it. The CLI agents store nothing in Obsidian; they reuse the login kept by the CLI.
+
+**Setup links and QR codes.** The QR code the bridge prints, and any `obsidian://notekit-edit` setup
+link, can contain an API or bridge key; treat them like the key itself. Opening a link never saves
+anything without confirmation, and a link can only add network agents, never one that starts a
+program. See [docs/setup-links.md](docs/setup-links.md).
 
 **Accounts and payment.** The plugin is free and open source, but every agent needs an account with
 its provider: a Claude Pro/Max or ChatGPT subscription for the CLI agents, a paid Anthropic or OpenAI

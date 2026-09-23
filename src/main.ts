@@ -7,7 +7,9 @@ import { PromptBox } from "./prompt-box";
 import { EditHistory, type EditRecord } from "./history";
 import { EditLogView, LOG_VIEW_TYPE } from "./log-view";
 import { SetupWizard } from "./wizard";
-import { NotekitEditSettingTab, type NotekitEditSettings, DEFAULT_SETTINGS, getProvider, migrateSettings, type Provider } from "./settings";
+import { NotekitEditSettingTab, type NotekitEditSettings, DEFAULT_SETTINGS, getProvider, migrateSettings, newProvider, type Provider } from "./settings";
+import { SetupLinkModal } from "./import-modal";
+import { parseSetupLink, SETUP_LINK_ACTION, type SetupLinkAgent } from "./setup-link";
 
 export default class NotekitEditPlugin extends Plugin {
   settings: NotekitEditSettings = DEFAULT_SETTINGS;
@@ -15,6 +17,7 @@ export default class NotekitEditPlugin extends Plugin {
   private box: PromptBox | null = null;
   private active = new Map<string, AbortController>();
   private statusEl: HTMLElement | null = null;
+  private wizard: SetupWizard | null = null;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -66,6 +69,9 @@ export default class NotekitEditPlugin extends Plugin {
       callback: () => this.openWizard(),
     });
 
+    // Setup links (obsidian://notekit-edit?…), usually from the QR code the bridge prints.
+    this.registerObsidianProtocolHandler(SETUP_LINK_ACTION, (params) => this.onSetupLink(params));
+
     if (!Platform.isMobile) {
       this.statusEl = this.addStatusBarItem();
       this.statusEl.addClass("ai-edit-status");
@@ -83,28 +89,85 @@ export default class NotekitEditPlugin extends Plugin {
    * but is not shown again automatically.
    */
   openWizard(): void {
-    new SetupWizard(this, (picked) => void this.applyWizardResult(picked)).open();
+    this.wizard = new SetupWizard(this, (picked) => {
+      this.wizard = null;
+      void this.applyWizardResult(picked);
+    });
+    this.wizard.open();
   }
 
   private async applyWizardResult(picked: Provider | null): Promise<void> {
-    {
-      if (picked) {
-        // Reuse an equivalent agent instead of piling up duplicates on re-runs.
-        const same = this.settings.providers.find(
-          (p) => p.type === picked.type && (p.type !== "openai" || p.baseUrl === picked.baseUrl),
-        );
-        if (same) {
-          Object.assign(same, { apiKey: picked.apiKey || same.apiKey, model: picked.model || same.model, command: picked.command || same.command });
-          this.settings.defaultProviderId = same.id;
-        } else {
-          this.settings.providers.push(picked);
-          this.settings.defaultProviderId = picked.id;
-        }
-        new Notice(`Notekit Edit will use “${(same ?? picked).name}”.`);
-      }
-      this.settings.setupDone = true;
-      await this.saveSettings();
+    if (picked) {
+      const saved = this.upsertProvider(picked, true, false);
+      new Notice(`Notekit Edit will use “${saved.name}”.`);
     }
+    this.settings.setupDone = true;
+    await this.saveSettings();
+  }
+
+  /** The configured agent a new one would replace: same type, and for OpenAI-compatible the same base URL. */
+  findMatchingProvider(p: Pick<Provider, "type" | "baseUrl">): Provider | undefined {
+    return this.settings.providers.find((x) => x.type === p.type && (p.type !== "openai" || x.baseUrl === p.baseUrl));
+  }
+
+  /**
+   * Adds `picked`, or updates the equivalent existing agent instead of piling up duplicates.
+   * Empty fields of `picked` never overwrite existing values. The wizard only refreshes key, model
+   * and command; a setup link (`fromLink`) also sets name, headers and effort. Returns the stored agent.
+   */
+  private upsertProvider(picked: Provider, makeDefault: boolean, fromLink: boolean): Provider {
+    const same = this.findMatchingProvider(picked);
+    let saved = picked;
+    if (same) {
+      Object.assign(same, {
+        apiKey: picked.apiKey || same.apiKey,
+        model: picked.model || same.model,
+        command: picked.command || same.command,
+      });
+      if (fromLink) {
+        Object.assign(same, {
+          name: picked.name || same.name,
+          headers: picked.headers || same.headers,
+          effort: picked.effort || same.effort,
+        });
+      }
+      saved = same;
+    } else {
+      this.settings.providers.push(picked);
+    }
+    if (makeDefault || this.settings.providers.length === 1) this.settings.defaultProviderId = saved.id;
+    return saved;
+  }
+
+  // ---- Setup links ------------------------------------------------------
+
+  private onSetupLink(params: Record<string, string>): void {
+    const result = parseSetupLink(params);
+    if (!result.ok) {
+      new Notice(`Notekit Edit setup link: ${result.error}`, 10000);
+      return;
+    }
+    this.app.workspace.onLayoutReady(() => {
+      // A link opened on a fresh install replaces the first-run wizard.
+      this.wizard?.close();
+      new SetupLinkModal(this, result).open();
+    });
+  }
+
+  /** Saves an agent from a confirmed setup link. Never creates a local (process-spawning) agent. */
+  async importAgent(agent: SetupLinkAgent, makeDefault: boolean): Promise<void> {
+    const p = newProvider(agent.type === "anthropic" ? "anthropic" : "openai");
+    // Only network fields are copied: command and allowTools keep the preset's empty/false values.
+    p.name = agent.name;
+    p.baseUrl = agent.baseUrl;
+    p.apiKey = agent.apiKey;
+    p.model = agent.model;
+    p.headers = agent.headers;
+    if (agent.effort) p.effort = agent.effort;
+    const saved = this.upsertProvider(p, makeDefault, true);
+    this.settings.setupDone = true;
+    await this.saveSettings();
+    new Notice(makeDefault ? `Added “${saved.name}”; it is now the default agent.` : `Added “${saved.name}”.`);
   }
 
   onunload(): void {

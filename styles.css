@@ -470,3 +470,19 @@
   background: var(--background-secondary);
   border-radius: var(--radius-s);
 }
+
+/* ---- Setup link import ---- */
+
+.ai-edit-import-input {
+  width: 100%;
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  resize: vertical;
+}
+
+.ai-edit-import-error {
+  min-height: 1.4em;
+  margin: 8px 0;
+  font-size: var(--font-ui-small);
+  color: var(--text-error);
+}

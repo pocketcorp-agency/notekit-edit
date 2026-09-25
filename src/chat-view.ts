@@ -1,27 +1,44 @@
 import { Component, ItemView, MarkdownRenderer, Notice, setIcon, type WorkspaceLeaf } from "obsidian";
-import type { ChatTurn } from "./chat";
+import type { ChatTurn, TurnStatus } from "./chat";
+import { closeOpenBlocks, LiveRender } from "./live-markdown";
 import type NotekitEditPlugin from "./main";
 import { getProvider } from "./settings";
 
 export const CHAT_VIEW_TYPE = "notekit-edit-chat";
 
+/** The DOM for one turn. Kept across renders so streaming updates happen in place. */
+interface TurnView {
+  turn: ChatTurn;
+  el: HTMLElement;
+  /** Assistant turns: where the Markdown goes. */
+  body: HTMLElement | null;
+  thinking: HTMLDetailsElement | null;
+  thinkingText: HTMLElement | null;
+  live: LiveRender | null;
+  /** Parent of the components of this turn's Markdown renders. */
+  component: Component;
+  /** Component of the Markdown currently shown; unloaded when the next render replaces it. */
+  current: Component | null;
+  finalized: boolean;
+  disposed: boolean;
+}
+
 /**
- * Sidebar chat about a note or a selection. Renders the plugin's ChatSession; the input stays in
- * place across renders so typing is never interrupted by streamed answers.
+ * Sidebar chat about a note or a selection. Renders the plugin's ChatSession. Turn elements are
+ * created once and updated in place: the streaming answer is re-rendered as Markdown (code blocks
+ * included) while it arrives, and the input stays untouched so typing is never interrupted.
  */
 export class ChatView extends ItemView {
   private headerEl!: HTMLElement;
   private listEl!: HTMLElement;
+  private emptyEl: HTMLElement | null = null;
   private input!: HTMLTextAreaElement;
   private sendBtn!: HTMLButtonElement;
   private agentSelect: HTMLSelectElement | null = null;
   private pending: number | null = null;
-  /** Owns the Markdown rendered for finished replies; replaced when a new chat starts. */
-  private rendered = new Component();
-  /** Finished turns already built, by id, so only the streaming reply is rebuilt on each frame. */
-  private cache = new Map<string, HTMLElement>();
-  /** The turns array the cache belongs to; ChatSession replaces it on start/clear. */
-  private cachedFor: ChatTurn[] | null = null;
+  private views = new Map<string, TurnView>();
+  /** The turns array the views belong to; ChatSession replaces it on start/clear. */
+  private viewsFor: ChatTurn[] | null = null;
   private stickToBottom = true;
 
   constructor(leaf: WorkspaceLeaf, private plugin: NotekitEditPlugin) {
@@ -69,10 +86,8 @@ export class ChatView extends ItemView {
   async onClose(): Promise<void> {
     if (this.pending !== null) this.contentEl.win.cancelAnimationFrame(this.pending);
     this.pending = null;
-    // Unload rendered Markdown and forget cached turns; reopening rebuilds them from the session.
-    this.removeChild(this.rendered);
-    this.cache.clear();
-    this.cachedFor = null;
+    // Reopening rebuilds every turn from the session.
+    this.disposeViews();
   }
 
   focusInput(): void {
@@ -104,21 +119,38 @@ export class ChatView extends ItemView {
     const ctx = chat.context;
     this.renderHeader();
 
-    if (chat.turns !== this.cachedFor) {
-      // New or cleared chat: drop cached turns and unload their rendered Markdown.
-      this.removeChild(this.rendered);
-      this.rendered = this.addChild(new Component());
-      this.cache.clear();
-      this.cachedFor = chat.turns;
+    if (chat.turns !== this.viewsFor) {
+      // New or cleared chat: drop the old turns and unload their rendered Markdown.
+      this.disposeViews();
+      this.viewsFor = chat.turns;
     }
-    this.listEl.empty();
 
-    if (!ctx) {
-      this.listEl.createDiv({ cls: "ai-chat-empty", text: "Right-click in a note and choose “Ask AI about this note”, or select text first and choose “Ask AI about selection”." });
-    } else if (!chat.turns.length) {
-      this.listEl.createDiv({ cls: "ai-chat-empty", text: ctx.scope === "selection" ? "Ask anything about the selected passage." : "Ask anything about this note." });
+    const emptyText = !ctx
+      ? "Right-click in a note and choose “Ask AI about this note”, or select text first and choose “Ask AI about selection”."
+      : !chat.turns.length
+        ? ctx.scope === "selection"
+          ? "Ask anything about the selected passage."
+          : "Ask anything about this note."
+        : "";
+    if (emptyText) {
+      this.emptyEl ??= this.listEl.createDiv({ cls: "ai-chat-empty" });
+      this.emptyEl.setText(emptyText);
+    } else {
+      this.emptyEl?.remove();
+      this.emptyEl = null;
     }
-    for (const turn of chat.turns) this.renderTurn(turn);
+
+    // Keep existing turn elements where they are; only add, reorder or remove what changed.
+    let prev: Element | null = this.emptyEl;
+    for (const turn of chat.turns) {
+      const view = this.viewFor(turn);
+      const expectedPrev = prev;
+      if (view.el.parentElement !== this.listEl || view.el.previousElementSibling !== expectedPrev) {
+        this.listEl.insertBefore(view.el, expectedPrev ? expectedPrev.nextSibling : this.listEl.firstChild);
+      }
+      this.updateTurn(view);
+      prev = view.el;
+    }
 
     this.input.disabled = !ctx;
     this.input.placeholder = !ctx ? "" : ctx.scope === "selection" ? "Ask about the selection…" : "Ask about this note…";
@@ -126,6 +158,10 @@ export class ChatView extends ItemView {
     setIcon(this.sendBtn, chat.busy ? "square" : "send");
     this.sendBtn.setAttr("aria-label", chat.busy ? "Stop" : "Send");
     this.sendBtn.disabled = !ctx;
+    this.scrollIfFollowing();
+  }
+
+  private scrollIfFollowing(): void {
     if (this.stickToBottom) this.listEl.scrollTop = this.listEl.scrollHeight;
   }
 
@@ -166,54 +202,131 @@ export class ChatView extends ItemView {
     clear.addEventListener("click", () => chat.clear());
   }
 
-  private renderTurn(turn: ChatTurn): void {
-    const cached = this.cache.get(turn.id);
-    if (cached) {
-      this.listEl.appendChild(cached);
-      return;
-    }
-    const el = this.listEl.createDiv({ cls: `ai-chat-turn is-${turn.role} is-${turn.status}` });
-    this.buildTurn(el, turn);
-    if (turn.status !== "streaming") this.cache.set(turn.id, el);
-  }
+  // ---- Turns ----------------------------------------------------------------
 
-  private buildTurn(el: HTMLElement, turn: ChatTurn): void {
-    const ctx = this.plugin.chat.context;
+  private viewFor(turn: ChatTurn): TurnView {
+    const existing = this.views.get(turn.id);
+    if (existing) return existing;
+    const el = createDiv({ cls: `ai-chat-turn is-${turn.role}` });
+    const view: TurnView = {
+      turn,
+      el,
+      body: null,
+      thinking: null,
+      thinkingText: null,
+      live: null,
+      component: this.addChild(new Component()),
+      current: null,
+      finalized: false,
+      disposed: false,
+    };
     if (turn.role === "user") {
       el.createDiv({ cls: "ai-chat-bubble", text: turn.content });
-      return;
+      view.finalized = true;
+    } else {
+      view.body = el.createDiv({ cls: "ai-chat-answer" });
+      if (turn.status === "streaming") {
+        view.body.addClass("is-streaming");
+        view.body.createSpan({ cls: "ai-edit-spinner" });
+      }
+      const win = this.contentEl.win;
+      view.live = new LiveRender((md) => this.renderMarkdown(view, md), {
+        set: (fn, ms) => win.setTimeout(fn, ms),
+        clear: (id) => win.clearTimeout(id),
+        now: () => Date.now(),
+      });
     }
+    this.views.set(turn.id, view);
+    return view;
+  }
+
+  private updateTurn(view: TurnView): void {
+    const turn = view.turn;
+    this.setStatusClass(view.el, turn.status);
+    if (turn.role === "user" || view.finalized) return;
 
     if (turn.thinking) {
-      const details = el.createEl("details", { cls: "ai-chat-thinking" });
-      details.createEl("summary", { text: "Thinking" });
-      details.createDiv({ cls: "ai-chat-thinking-text", text: turn.thinking });
+      if (!view.thinking) {
+        // Built once and updated in place, so it keeps its open/closed state while streaming.
+        view.thinking = createEl("details", { cls: "ai-chat-thinking" });
+        view.thinking.createEl("summary", { text: "Thinking" });
+        view.thinkingText = view.thinking.createDiv({ cls: "ai-chat-thinking-text" });
+        view.el.insertBefore(view.thinking, view.body);
+      }
+      if (view.thinkingText && view.thinkingText.textContent !== turn.thinking) view.thinkingText.setText(turn.thinking);
     }
-    const body = el.createDiv({ cls: "ai-chat-answer" });
-    if (turn.status === "streaming") {
-      if (turn.content) body.createDiv({ cls: "ai-chat-streaming", text: turn.content });
-      else body.createSpan({ cls: "ai-edit-spinner" });
-    } else if (turn.content) {
-      void MarkdownRenderer.render(this.app, turn.content, body, ctx?.file.path ?? "", this.rendered);
-    }
-    if (turn.status === "error") el.createDiv({ cls: "ai-chat-error", text: turn.error ?? "Something went wrong." });
-    if (turn.status === "cancelled") el.createDiv({ cls: "ai-chat-note", text: "Stopped." });
 
-    if (turn.status !== "done" || !turn.content || !ctx) return;
-    const actions = el.createDiv({ cls: "ai-chat-actions" });
-    const action = (icon: string, label: string, run: () => void) => {
-      const b = actions.createEl("button", { cls: "ai-chat-action", attr: { "aria-label": label } });
-      setIcon(b.createSpan(), icon);
-      b.createSpan({ text: label });
-      b.addEventListener("click", run);
-    };
-    action("copy", "Copy", () => {
-      void navigator.clipboard.writeText(turn.content).then(() => new Notice("Copied."));
-    });
-    action("text-cursor-input", "Insert at cursor", () => void this.plugin.insertIntoNote(ctx.file, turn.content));
-    if (ctx.scope === "selection") {
-      action("replace", "Replace selection", () => void this.plugin.replaceSelectionInNote(ctx, turn.content));
+    if (turn.status === "streaming") {
+      if (turn.content) view.live?.update(closeOpenBlocks(turn.content));
+      return;
     }
-    if (turn.agent) actions.createSpan({ cls: "ai-chat-agent-name", text: turn.agent });
+    view.finalized = true;
+    void this.finalizeTurn(view);
+  }
+
+  private setStatusClass(el: HTMLElement, status: TurnStatus): void {
+    for (const s of ["streaming", "done", "error", "cancelled"] as const) el.toggleClass(`is-${s}`, s === status);
+  }
+
+  /** Renders `md` off-screen, then swaps it in, so the answer never flashes empty between renders. */
+  private async renderMarkdown(view: TurnView, md: string): Promise<void> {
+    if (view.disposed || !view.body) return;
+    const staging = createDiv();
+    const component = view.component.addChild(new Component());
+    await MarkdownRenderer.render(this.app, md, staging, this.plugin.chat.context?.file.path ?? "", component);
+    if (view.disposed) {
+      view.component.removeChild(component);
+      return;
+    }
+    view.body.replaceChildren(...Array.from(staging.childNodes));
+    if (view.current) view.component.removeChild(view.current);
+    view.current = component;
+    this.scrollIfFollowing();
+  }
+
+  /** Final render of a finished answer, then its notes and actions. */
+  private async finalizeTurn(view: TurnView): Promise<void> {
+    const turn = view.turn;
+    const body = view.body;
+    if (!body) return;
+    body.removeClass("is-streaming");
+    if (turn.content) await view.live?.finish(turn.content);
+    else body.empty();
+    view.live?.dispose();
+    if (view.disposed) return;
+
+    const ctx = this.plugin.chat.context;
+    if (turn.status === "error") view.el.createDiv({ cls: "ai-chat-error", text: turn.error ?? "Something went wrong." });
+    if (turn.status === "cancelled") view.el.createDiv({ cls: "ai-chat-note", text: "Stopped." });
+
+    if (turn.status === "done" && turn.content && ctx) {
+      const actions = view.el.createDiv({ cls: "ai-chat-actions" });
+      const action = (icon: string, label: string, run: () => void) => {
+        const b = actions.createEl("button", { cls: "ai-chat-action", attr: { "aria-label": label } });
+        setIcon(b.createSpan(), icon);
+        b.createSpan({ text: label });
+        b.addEventListener("click", run);
+      };
+      action("copy", "Copy", () => {
+        void navigator.clipboard.writeText(turn.content).then(() => new Notice("Copied."));
+      });
+      action("text-cursor-input", "Insert at cursor", () => void this.plugin.insertIntoNote(ctx.file, turn.content));
+      if (ctx.scope === "selection") {
+        action("replace", "Replace selection", () => void this.plugin.replaceSelectionInNote(ctx, turn.content));
+      }
+      if (turn.agent) actions.createSpan({ cls: "ai-chat-agent-name", text: turn.agent });
+    }
+    this.scrollIfFollowing();
+  }
+
+  private disposeViews(): void {
+    for (const view of this.views.values()) {
+      view.disposed = true;
+      view.live?.dispose();
+      this.removeChild(view.component);
+      view.el.remove();
+    }
+    this.views.clear();
+    this.viewsFor = null;
   }
 }

@@ -64,8 +64,10 @@ or the note.
 - The header shows what the chat is about and, with several agents, which agent answers.
 - Every question sends the **latest** content of the note, so the agent sees your edits since the
   last question. A selection stays the passage you selected when you opened the chat.
-- Answers stream in and are shown as Markdown. Under each answer: **Copy**, **Insert at cursor**
-  (into the note, at the cursor or after the selection) and, for a selection, **Replace selection**.
+- Answers render as Markdown while they stream in: headings, lists, tables and code blocks with
+  syntax highlighting appear as the text arrives, and a blinking bar marks an answer in progress.
+- Under each finished answer: **Copy**, **Insert at cursor** (into the note, at the cursor or after
+  the selection) and, for a selection, **Replace selection**.
   The note only changes when you click one of these; each is a single undo step. After a
   replacement, the chat is about the new text, so you can refine it further.
 - Enter sends, Shift+Enter adds a line; the send button turns into **Stop** while an answer streams.

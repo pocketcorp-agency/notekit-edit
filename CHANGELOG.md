@@ -8,6 +8,12 @@ as Obsidian requires.
 
 ## [Unreleased]
 
+### Changed
+- Ask AI chat answers render as Markdown while they stream: headings, lists, tables and code blocks with syntax highlighting appear as the text arrives (an open code block is closed early so it renders as code). Re-renders are throttled to the renderer's speed, and a blinking bar marks an answer in progress.
+
+### Fixed
+- The chat's *Thinking* section keeps its open or closed state while an answer streams, and the list no longer jumps while streaming.
+
 ## [0.3.0] - 2026-09-25
 
 ### Added

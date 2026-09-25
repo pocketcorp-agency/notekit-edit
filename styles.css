@@ -579,8 +579,28 @@
 .ai-chat-answer > :first-child { margin-top: 0; }
 .ai-chat-answer > :last-child { margin-bottom: 0; }
 
-.ai-chat-streaming {
-  white-space: pre-wrap;
+/* Rendered answers: keep wide code blocks and tables inside the sidebar. */
+.ai-chat-answer pre,
+.ai-chat-answer table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Blinking caret after an answer that is still streaming. */
+.ai-chat-answer.is-streaming::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 1em;
+  margin-top: 2px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  background: var(--color-purple);
+  animation: ai-edit-pulse 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-chat-answer.is-streaming::after { animation: none; }
 }
 
 .ai-chat-thinking {

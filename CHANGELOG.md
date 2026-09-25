@@ -9,6 +9,7 @@ as Obsidian requires.
 ## [Unreleased]
 
 ### Added
+- **Ask AI** chat: right-click and choose *Ask AI about selection* or *Ask AI about this note* (or the command *Ask AI about selection or note*) to open a sidebar chat about the passage or the whole note. Each question sends the note's latest content; answers render as Markdown and can be copied, inserted at the cursor or replace the selection. Works with every agent type; the CLI and ACP agents receive the conversation as a transcript.
 - Set up an agent by scanning a QR code: the bridge prints a QR code and an `obsidian://notekit-edit` setup link when it starts; the phone's camera opens Obsidian, which confirms and adds the agent. New bridge options `--public-url` and `--no-qr`.
 - Settings > **Import setup link** accepts the same link pasted as text.
 - `npm run bridge:setup` sets up the bridge in one command: checks the CLI login, keeps a random key in `~/.config/notekit-bridge/key`, prints the pairing QR code, and with `--install` runs the bridge in the background at login (launchd on macOS, systemd on Linux). `--pair` shows the QR code again, `--uninstall` removes the service.

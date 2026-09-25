@@ -36,6 +36,9 @@ Watch the [full trailer](docs/media/trailer-preview.mp4) (MP4, 960p preview).
 
 - **Edit in place.** Right-click a selection, type an instruction, and the replacement streams into
   the note while the passage is highlighted. One undo step reverts it.
+- **Ask AI about it.** Right-click and choose *Ask AI about selection* (or *about this note*): a
+  sidebar chat opens where you can ask follow-up questions, then copy an answer, insert it at the
+  cursor or let it replace the selection.
 - **Write at the cursor.** With nothing selected, the AI writes new text at the cursor with the full
   note as context.
 - **Your subscription, no key required.** The default agent runs the locally installed Claude Code
@@ -107,8 +110,10 @@ The **Test** button on an agent card makes one request to the same endpoint (`/m
 
 **What is sent.** Every edit sends the full content of the current note (capped at 150,000 characters
 before and after the target for very large notes), the note's name, the selected text or the cursor
-position, your instruction, and the *Extra instructions* from the settings. No other notes and no
-vault metadata are sent. Nothing is sent when you only open the prompt box.
+position, your instruction, and the *Extra instructions* from the settings. Every question in the
+*Ask AI* chat sends the note's current full content (capped at 300,000 characters), the selected
+passage if the chat is about one, and the conversation so far. No other notes and no vault metadata
+are sent. Nothing is sent when you only open the prompt box or the chat.
 
 **External executables.** On desktop, and only for agents of the types *Claude Code CLI*, *Codex CLI*
 and *ACP agent*, the plugin starts a local process with the command you configured: `claude -p`

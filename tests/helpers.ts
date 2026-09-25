@@ -3,6 +3,9 @@ import { createServer, type Server } from "node:http";
 
 export { assert };
 
+/** The JSON body of the last POST the mock server received. */
+export const lastRequest: { body: unknown } = { body: null };
+
 /** OpenAI-compatible mock server that mimics Hermes' SSE stream (including its custom event lines). */
 export function startMockServer(port: number): Promise<Server> {
   const words = ["Hi ", "there, ", "friend."];
@@ -19,6 +22,7 @@ export function startMockServer(port: number): Promise<Server> {
         return res.end(JSON.stringify({ data: [{ id: "hermes-agent" }, { id: "other" }] }));
       }
       const j = JSON.parse(body) as { stream?: boolean };
+      lastRequest.body = j;
       if (j.stream) {
         res.writeHead(200, { "content-type": "text/event-stream" });
         res.write('event: hermes.tool.progress\ndata: {"tool":"web_search","status":"start"}\n\n');

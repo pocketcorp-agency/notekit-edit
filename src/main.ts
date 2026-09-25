@@ -1,4 +1,4 @@
-import { Editor, FileSystemAdapter, MarkdownView, Menu, Notice, Platform, Plugin } from "obsidian";
+import { Editor, FileSystemAdapter, MarkdownView, Menu, Notice, Platform, Plugin, type TFile, type WorkspaceLeaf } from "obsidian";
 import { Transaction } from "@codemirror/state";
 import { EditorView, ViewPlugin } from "@codemirror/view";
 import { describeError, normalizeReplacement, type RuntimeContext, shutdownLocalAgents, streamEdit } from "./ai";
@@ -9,11 +9,15 @@ import { EditLogView, LOG_VIEW_TYPE } from "./log-view";
 import { SetupWizard } from "./wizard";
 import { NotekitEditSettingTab, type NotekitEditSettings, DEFAULT_SETTINGS, getProvider, migrateSettings, newProvider, type Provider } from "./settings";
 import { SetupLinkModal } from "./import-modal";
+import { type ChatContext, ChatSession, locateText } from "./chat";
+import { CHAT_VIEW_TYPE, ChatView } from "./chat-view";
 import { parseSetupLink, SETUP_LINK_ACTION, type SetupLinkAgent } from "./setup-link";
 
 export default class NotekitEditPlugin extends Plugin {
   settings: NotekitEditSettings = DEFAULT_SETTINGS;
   history = new EditHistory();
+  /** The current Ask AI conversation, shown in the chat sidebar. */
+  chat = new ChatSession(this);
   private box: PromptBox | null = null;
   private active = new Map<string, AbortController>();
   private statusEl: HTMLElement | null = null;
@@ -24,6 +28,7 @@ export default class NotekitEditPlugin extends Plugin {
     this.addSettingTab(new NotekitEditSettingTab(this.app, this));
 
     this.registerView(LOG_VIEW_TYPE, (leaf) => new EditLogView(leaf, this));
+    this.registerView(CHAT_VIEW_TYPE, (leaf) => new ChatView(leaf, this));
     this.addRibbonIcon("sparkles", "AI edits", () => void this.openLogView());
     this.addCommand({ id: "open-log", name: "Open AI edits panel", icon: "list", callback: () => void this.openLogView() });
 
@@ -41,6 +46,13 @@ export default class NotekitEditPlugin extends Plugin {
             .setSection("selection")
             .onClick(() => this.openBoxForEditor(editor)),
         );
+        menu.addItem((item) =>
+          item
+            .setTitle(sel.empty ? "Ask AI about this note" : "Ask AI about selection")
+            .setIcon("message-square")
+            .setSection("selection")
+            .onClick(() => void this.openChat(editor)),
+        );
       }),
     );
 
@@ -49,6 +61,13 @@ export default class NotekitEditPlugin extends Plugin {
       name: "Ask AI to edit selection or write at cursor",
       icon: "sparkles",
       editorCallback: (editor) => this.openBoxForEditor(editor),
+    });
+
+    this.addCommand({
+      id: "ask-ai-chat",
+      name: "Ask AI about selection or note",
+      icon: "message-square",
+      editorCallback: (editor) => void this.openChat(editor),
     });
 
     this.addCommand({
@@ -171,6 +190,7 @@ export default class NotekitEditPlugin extends Plugin {
   }
 
   onunload(): void {
+    this.chat.stop();
     this.box?.close();
     this.cancelAll();
     shutdownLocalAgents();
@@ -196,11 +216,105 @@ export default class NotekitEditPlugin extends Plugin {
   // ---- Edit log ----------------------------------------------------------
 
   async openLogView(): Promise<void> {
-    const existing = this.app.workspace.getLeavesOfType(LOG_VIEW_TYPE)[0];
+    await this.revealView(LOG_VIEW_TYPE);
+  }
+
+  /** Shows the view of `type` in the right sidebar (the right drawer on mobile), creating it if needed. */
+  private async revealView(type: string): Promise<WorkspaceLeaf | null> {
+    const existing = this.app.workspace.getLeavesOfType(type)[0];
     const leaf = existing ?? this.app.workspace.getRightLeaf(false);
-    if (!leaf) return;
-    if (!existing) await leaf.setViewState({ type: LOG_VIEW_TYPE, active: true });
+    if (!leaf) return null;
+    if (!existing) await leaf.setViewState({ type, active: true });
     await this.app.workspace.revealLeaf(leaf);
+    return leaf;
+  }
+
+  // ---- Ask AI chat --------------------------------------------------------
+
+  /** Starts a chat about the editor's selection (or the whole note) and opens the chat sidebar. */
+  async openChat(editor: Editor): Promise<void> {
+    const file = this.markdownViewFor(editor)?.file ?? this.app.workspace.getActiveFile();
+    if (!file) {
+      new Notice("Open a note first.");
+      return;
+    }
+    const selection = editor.getSelection();
+    const context: ChatContext = {
+      file,
+      scope: selection.trim() ? "selection" : "note",
+      selection: selection.trim() ? selection : "",
+      selectionFrom: editor.posToOffset(editor.getCursor("from")),
+    };
+    this.chat.start(context);
+    const leaf = await this.revealView(CHAT_VIEW_TYPE);
+    const view = leaf?.view;
+    if (view instanceof ChatView) view.focusInput();
+  }
+
+  /** The note's current text: the open editor's content (unsaved changes included), else the file. */
+  async currentNoteText(file: TFile): Promise<string> {
+    const view = this.markdownViewForFile(file);
+    return view ? view.editor.getValue() : this.app.vault.cachedRead(file);
+  }
+
+  /** Inserts a chat answer at the cursor of the note, opening the note if needed. */
+  async insertIntoNote(file: TFile, text: string): Promise<void> {
+    const view = await this.openMarkdownView(file);
+    if (!view) return;
+    const editor = view.editor;
+    const at = editor.getCursor("to");
+    editor.replaceRange(text, at);
+    editor.setCursor(editor.offsetToPos(editor.posToOffset(at) + text.length));
+    new Notice(`Inserted into “${file.basename}”.`);
+  }
+
+  /** Replaces the passage the chat is about with a chat answer, if it can still be found. */
+  async replaceSelectionInNote(context: ChatContext, text: string): Promise<void> {
+    const view = await this.openMarkdownView(context.file);
+    if (!view) return;
+    const editor = view.editor;
+    const range = locateText(editor.getValue(), context.selection, context.selectionFrom);
+    if (!range) {
+      new Notice("The selected passage has changed or is gone. Insert the answer at the cursor or copy it instead.", 8000);
+      return;
+    }
+    const replacement = normalizeReplacement(text, context.selection);
+    editor.replaceRange(replacement, editor.offsetToPos(range.from), editor.offsetToPos(range.to));
+    // The chat is now about the new text, so "Replace selection" can be used again on the next answer.
+    context.selection = replacement;
+    context.selectionFrom = range.from;
+    new Notice(`Replaced the selection in “${context.file.basename}”.`);
+  }
+
+  private markdownViewFor(editor: Editor): MarkdownView | null {
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      if (leaf.view instanceof MarkdownView && leaf.view.editor === editor) return leaf.view;
+    }
+    return null;
+  }
+
+  private markdownViewForFile(file: TFile): MarkdownView | null {
+    const active = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (active?.file === file) return active;
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      if (leaf.view instanceof MarkdownView && leaf.view.file === file) return leaf.view;
+    }
+    return null;
+  }
+
+  /** The editor showing `file`, opening the note in the main area when it is not open. */
+  private async openMarkdownView(file: TFile): Promise<MarkdownView | null> {
+    if (!this.app.vault.getFileByPath(file.path)) {
+      new Notice("The note this chat is about no longer exists.");
+      return null;
+    }
+    let view = this.markdownViewForFile(file);
+    if (!view) {
+      await this.app.workspace.getLeaf(false).openFile(file);
+      view = this.markdownViewForFile(file);
+    }
+    if (!view) new Notice(`Could not open “${file.basename}” in an editor.`);
+    return view;
   }
 
   clearHistory(): void {

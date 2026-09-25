@@ -14,6 +14,12 @@ export interface RuntimeContext {
   log?: (line: string) => void;
 }
 
+/** One turn of a conversation sent to an agent. */
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export interface EditRequest {
   instruction: string;
   /** Selected text to rewrite; empty means "insert new text at the cursor". */
@@ -81,28 +87,62 @@ export function streamEdit(
   req: EditRequest,
   signal: AbortSignal,
 ): AsyncGenerator<StreamEvent, void, undefined> {
-  const system = buildSystem(settings, req);
-  const user = buildUserMessage(req);
+  return streamMessages(provider, settings, ctx, buildSystem(settings, req), [{ role: "user", content: buildUserMessage(req) }], signal);
+}
+
+/**
+ * Streams the agent's reply to a conversation (alternating turns, starting and ending with the
+ * user). Used by the Ask AI chat; the caller builds the system prompt.
+ */
+export function streamChat(
+  provider: Provider,
+  settings: NotekitEditSettings,
+  ctx: RuntimeContext,
+  system: string,
+  messages: ChatMessage[],
+  signal: AbortSignal,
+): AsyncGenerator<StreamEvent, void, undefined> {
+  return streamMessages(provider, settings, ctx, system, messages, signal);
+}
+
+function streamMessages(
+  provider: Provider,
+  settings: NotekitEditSettings,
+  ctx: RuntimeContext,
+  system: string,
+  messages: ChatMessage[],
+  signal: AbortSignal,
+): AsyncGenerator<StreamEvent, void, undefined> {
   switch (provider.type) {
     case "anthropic":
-      return streamAnthropic(provider, settings, system, user, signal);
+      return streamAnthropic(provider, settings, system, messages, signal);
     case "claude-code":
       requireDesktop(provider);
       return streamClaudeCli(
         { command: provider.command || "claude", model: provider.model, effort: provider.effort, cwd: ctx.vaultPath, onLog: ctx.log },
         system,
-        user,
+        flattenConversation(messages),
         signal,
       );
     case "codex-cli":
       requireDesktop(provider);
-      return streamCodexCli({ command: provider.command || "codex", model: provider.model, cwd: ctx.vaultPath, onLog: ctx.log }, system, user, signal);
+      return streamCodexCli({ command: provider.command || "codex", model: provider.model, cwd: ctx.vaultPath, onLog: ctx.log }, system, flattenConversation(messages), signal);
     case "acp":
       requireDesktop(provider);
-      return streamAcp(provider, ctx, system, user, signal);
+      return streamAcp(provider, ctx, system, flattenConversation(messages), signal);
     default:
-      return streamOpenAICompatible(provider, settings, system, user, signal);
+      return streamOpenAICompatible(provider, settings, system, messages, signal);
   }
+}
+
+/**
+ * For backends that take a single prompt (the CLIs and ACP): one message is sent as it is; a longer
+ * conversation becomes a transcript ending with the question to answer.
+ */
+export function flattenConversation(messages: ChatMessage[]): string {
+  if (messages.length === 1) return messages[0].content;
+  const turns = messages.map((m) => `<${m.role}>\n${m.content}\n</${m.role}>`).join("\n\n");
+  return `The conversation so far, oldest first:\n\n${turns}\n\nReply to the last user message. Write only your reply, without tags.`;
 }
 
 /** Local agents spawn processes, which needs Node; that exists only in the desktop (Electron) app. */
@@ -199,7 +239,7 @@ async function* streamAnthropic(
   p: Provider,
   settings: NotekitEditSettings,
   system: string,
-  user: string,
+  messages: ChatMessage[],
   signal: AbortSignal,
 ): AsyncGenerator<StreamEvent, void, undefined> {
   const client = anthropicClient(p);
@@ -210,7 +250,7 @@ async function* streamAnthropic(
       model: p.model,
       max_tokens: settings.maxTokens,
       system,
-      messages: [{ role: "user", content: user }],
+      messages,
       // Effort + adaptive thinking are not available on Haiku 4.5. Summarised thinking is
       // requested so the edit log can show the model's reasoning.
       ...(isHaiku ? {} : { output_config: { effort: p.effort }, thinking: { type: "adaptive" as const, display: "summarized" as const } }),
@@ -267,17 +307,14 @@ async function* streamOpenAICompatible(
   p: Provider,
   settings: NotekitEditSettings,
   system: string,
-  user: string,
+  messages: ChatMessage[],
   signal: AbortSignal,
 ): AsyncGenerator<StreamEvent, void, undefined> {
   if (!p.model) throw new Error(`No model set for “${p.name}”.`);
   const url = openAIUrl(p, "/chat/completions");
   const body = {
     model: p.model,
-    messages: [
-      { role: "system", content: system },
-      { role: "user", content: user },
-    ],
+    messages: [{ role: "system", content: system }, ...messages],
     max_tokens: settings.maxTokens,
     stream: true,
   };

@@ -13,10 +13,29 @@ src/
   stream.ts             the text/thinking event type every backend yields
   history.ts            edit records with change events
   log-view.ts           the sidebar "AI edits" panel
+  chat.ts               Ask AI conversation state, context block, request building (no DOM)
+  chat-view.ts          the sidebar "Ask AI" chat view
+  setup-link.ts         obsidian://notekit-edit setup links: build, parse, validate
+  import-modal.ts       confirmation dialog for setup links
+  qr-terminal.ts        terminal QR rendering for the bridge (bridge only)
   settings.ts           settings model, migration, agent presets, settings tab
   wizard.ts             first-run wizard
   bridge.ts             standalone Node server, built to bridge/claude-bridge.cjs
 ```
+
+## A chat, end to end
+
+1. *Ask AI about selection / this note* (context menu or command) calls `openChat` in `main.ts`,
+   which starts a fresh `ChatSession` (`chat.ts`) with the file, the scope and the selected text, and
+   reveals the `ChatView` in the right sidebar.
+2. On send, the session reads the note's current text (the open editor, else the vault), builds a
+   context block from it and puts it in front of the first question, keeps only completed
+   question/answer pairs, and calls `streamChat` in `ai.ts` with the chat system prompt.
+3. `streamChat` shares the backend dispatch with edits. Anthropic and OpenAI-compatible agents get
+   the turns as real messages; the CLI and ACP agents get `flattenConversation`'s transcript.
+4. The session appends events to the answer turn and emits `change`; the view re-renders once per
+   frame, rebuilding only the streaming answer. Copy, Insert and Replace call back into `main.ts`,
+   which edits the note through the Obsidian `Editor` API.
 
 ## An edit, end to end
 

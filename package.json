@@ -1,6 +1,6 @@
 {
   "name": "notekit-edit",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Select text or place the cursor, describe the change, and watch Claude or Codex stream it into the note. Uses your Claude or ChatGPT subscription, an API key, or any OpenAI-compatible agent.",
   "main": "main.js",
   "scripts": {

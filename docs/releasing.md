@@ -59,7 +59,7 @@ Submission happens on the Obsidian community site, not through a pull request an
 Before submitting, make sure that:
 
 - the repository is public and has `README.md`, `LICENSE` and `manifest.json` in its root;
-- a GitHub release exists whose tag equals `manifest.json`'s version exactly (`0.2.1`, no `v`), with
+- a GitHub release exists whose tag equals `manifest.json`'s version exactly (for example `0.3.0`, no `v`), with
   `main.js`, `manifest.json` and `styles.css` attached as individual assets, not a zip;
 - the plugin `id` is unique across the directory and does not contain "obsidian" (`notekit-edit`);
 - `npm run lint` is clean: it runs `eslint-plugin-obsidianmd`, the same guideline rules the reviewers

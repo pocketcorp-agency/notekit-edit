@@ -267,7 +267,7 @@ var AcpAgent = class {
     const init = await this.request("initialize", {
       protocolVersion: 1,
       clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false },
-      clientInfo: { name: "notekit-edit", title: "Notekit Edit", version: "0.2.1" }
+      clientInfo: { name: "notekit-edit", title: "Notekit Edit", version: "0.3.0" }
     });
     this.agentName = init?.agentInfo?.title ?? init?.agentInfo?.name ?? "";
     const methods = init?.authMethods ?? [];

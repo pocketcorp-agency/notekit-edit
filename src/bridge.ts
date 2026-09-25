@@ -5,13 +5,16 @@
  *
  *   node bridge/claude-bridge.cjs --key <secret> [--port 8765] [--host 0.0.0.0]
  *        [--backend claude|codex|acp] [--acp-command "npx -y @agentclientprotocol/claude-agent-acp"]
- *        [--cwd /path/for/agent] [--allow-tools]
+ *        [--cwd /path/for/agent] [--allow-tools] [--public-url URL] [--no-qr] [--key-file PATH] [--pair]
  *
  * Endpoints: GET /v1/models, POST /v1/chat/completions (stream: true → SSE), GET /health
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { homedir } from "node:os";
+import { readFileSync } from "node:fs";
+import { homedir, networkInterfaces } from "node:os";
 import { AcpAgent } from "./acp";
+import { renderQr } from "./qr-terminal";
+import { buildSetupLink } from "./setup-link";
 import { streamClaudeCli } from "./claude-cli";
 import { streamCodexCli } from "./codex-cli";
 import type { StreamEvent } from "./stream";
@@ -28,6 +31,12 @@ interface Options {
   allowTools: boolean;
   claudeCommand: string;
   codexCommand: string;
+  /** Base URL phones should use, when auto-detection picks the wrong address (VPN, reverse proxy). */
+  publicUrl: string;
+  /** Print the setup link and QR code on start. */
+  qr: boolean;
+  /** Only print the setup link and QR code, then exit (used by `npm run bridge:setup` for a running service). */
+  pair: boolean;
 }
 
 function parseArgs(argv: string[]): Options {
@@ -41,6 +50,9 @@ function parseArgs(argv: string[]): Options {
     allowTools: false,
     claudeCommand: "claude",
     codexCommand: "codex",
+    publicUrl: "",
+    qr: true,
+    pair: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -55,14 +67,27 @@ function parseArgs(argv: string[]): Options {
       case "--allow-tools": o.allowTools = true; break;
       case "--claude-command": o.claudeCommand = v(); break;
       case "--codex-command": o.codexCommand = v(); break;
+      case "--public-url": o.publicUrl = v().replace(/\/+$/, ""); break;
+      case "--no-qr": o.qr = false; break;
+      case "--pair": o.pair = true; break;
+      case "--key-file": {
+        const file = v();
+        try {
+          o.key = readFileSync(file, "utf8").trim();
+        } catch (e) {
+          console.error(`Cannot read --key-file ${file}: ${(e as Error).message}`);
+          process.exit(1);
+        }
+        break;
+      }
       case "-h":
       case "--help":
-        console.log("Usage: node claude-bridge.cjs --key <secret> [--port 8765] [--host 0.0.0.0] [--backend claude|codex|acp] [--acp-command CMD] [--cwd DIR] [--allow-tools]");
+        console.log("Usage: node claude-bridge.cjs --key <secret> | --key-file <path> [--port 8765] [--host 0.0.0.0] [--backend claude|codex|acp] [--acp-command CMD] [--cwd DIR] [--allow-tools] [--public-url URL] [--no-qr] [--pair]");
         process.exit(0);
     }
   }
   if (!o.key) {
-    console.error("Refusing to start without --key (or BRIDGE_KEY): anyone on the network could otherwise use your subscription.");
+    console.error("Refusing to start without --key, --key-file or BRIDGE_KEY: anyone on the network could otherwise use your subscription.");
     process.exit(1);
   }
   return o;
@@ -185,13 +210,54 @@ const server = createServer(async (req, res) => {
   json(res, 404, { error: { message: "Not found. Endpoints: GET /v1/models, POST /v1/chat/completions" } });
 });
 
+const MODEL = opts.backend === "codex" ? "codex" : opts.backend === "acp" ? "acp" : "claude";
+const AGENT_NAME = opts.backend === "codex" ? "Codex bridge" : opts.backend === "acp" ? "ACP bridge" : "Claude Code bridge";
+
+/** Base URLs a phone could use to reach this bridge, best guess first. */
+function candidateBaseUrls(): string[] {
+  if (opts.publicUrl) return [opts.publicUrl];
+  if (opts.host !== "0.0.0.0" && opts.host !== "::") return [`http://${opts.host}:${opts.port}/v1`];
+  const rank = (ip: string) => (/^192\.168\./.test(ip) ? 0 : /^10\./.test(ip) ? 1 : /^172\.(1[6-9]|2\d|3[01])\./.test(ip) ? 2 : /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(ip) ? 3 : 4);
+  const ips: string[] = [];
+  for (const list of Object.values(networkInterfaces())) {
+    for (const a of list ?? []) if (a.family === "IPv4" && !a.internal) ips.push(a.address);
+  }
+  ips.sort((a, b) => rank(a) - rank(b));
+  return (ips.length ? ips : ["127.0.0.1"]).map((ip) => `http://${ip}:${opts.port}/v1`);
+}
+
+function printSetupLinks(): void {
+  const urls = candidateBaseUrls();
+  const links = urls.map((url) => buildSetupLink({ type: "openai", url, key: opts.key, model: MODEL, name: AGENT_NAME }));
+  const out = process.stdout;
+  out.write("\nSet up Notekit Edit on a phone: scan this QR code with the phone's camera (it opens Obsidian).\n");
+  out.write("It contains the bridge key: anyone who sees it can use your subscription through this bridge.\n\n");
+  if (out.isTTY) out.write(renderQr(links[0]) + "\n\n");
+  out.write(`Setup link (${urls[0]}):\n${links[0]}\n`);
+  if (links.length > 1) {
+    out.write("\nOther addresses of this computer, if the phone cannot reach the one above:\n");
+    for (const l of links.slice(1)) out.write(`${l}\n`);
+  }
+  out.write(`\nWrong address? Use --public-url http://<reachable-host>:${opts.port}/v1.${opts.pair ? "" : " Hide this with --no-qr."}\n\n`);
+}
+
+if (opts.pair) {
+  // Pairing only: print the QR code for a bridge that is already running (for example as a service).
+  printSetupLinks();
+  process.exit(0);
+}
+
 server.listen(opts.port, opts.host, () => {
   log(`listening on http://${opts.host}:${opts.port}/v1 (backend: ${opts.backend}, cwd: ${opts.cwd})`);
-  log(`In Obsidian: add an "OpenAI-compatible" agent with base URL http://<this-machine>:${opts.port}/v1, the --key as API key, model "${opts.backend === "codex" ? "codex" : opts.backend === "acp" ? "acp" : "claude"}".`);
+  log(`In Obsidian: add an "OpenAI-compatible" agent with base URL http://<this-machine>:${opts.port}/v1, the --key as API key, model "${MODEL}".`);
+  if (opts.qr) printSetupLinks();
 });
 
-process.on("SIGINT", () => {
-  acp?.shutdown();
-  server.close();
-  process.exit(0);
-});
+// SIGINT from Ctrl+C, SIGTERM from launchd/systemd when the service stops.
+for (const sig of ["SIGINT", "SIGTERM"] as const) {
+  process.on(sig, () => {
+    acp?.shutdown();
+    server.close();
+    process.exit(0);
+  });
+}

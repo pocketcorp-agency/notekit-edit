@@ -22,6 +22,7 @@ npm install
 | `npm test` | Bundles `tests/*.test.ts` with a mocked `obsidian` module and runs them under Node |
 | `npm run check-version` | Verifies package.json, manifest.json, versions.json and CHANGELOG.md agree |
 | `npm run deploy` | Builds and copies the plugin into a vault (`./deploy.sh /path/to/vault`) |
+| `npm run bridge:setup` | Runs the bridge with a stored key and shows the pairing QR code; `-- --install` for a background service |
 
 ## Testing in Obsidian
 

@@ -1,6 +1,7 @@
 import { App, Notice, Platform, PluginSettingTab, Setting } from "obsidian";
 import type NotekitEditPlugin from "./main";
 import { testProvider } from "./ai";
+import { SetupLinkModal } from "./import-modal";
 
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 export type ProviderType = "anthropic" | "openai" | "claude-code" | "codex-cli" | "acp";
@@ -120,6 +121,11 @@ export class NotekitEditSettingTab extends PluginSettingTab {
       .setName("Setup wizard")
       .setDesc("Pick Claude or Codex and whether to use a subscription or an API key. This is how agents are added; re-run it any time.")
       .addButton((b) => b.setButtonText("Relaunch wizard").setCta().onClick(() => this.plugin.openWizard()));
+
+    new Setting(containerEl)
+      .setName("Import setup link")
+      .setDesc("Add an agent from a setup link, for example the one the bridge prints next to its QR code. Scanning that QR code with the phone camera does the same.")
+      .addButton((b) => b.setButtonText("Paste link").onClick(() => new SetupLinkModal(this.plugin, null, () => this.refresh()).open()));
 
     new Setting(containerEl).setName("Agents").setHeading();
     containerEl.createEl("p", {

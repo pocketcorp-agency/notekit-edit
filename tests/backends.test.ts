@@ -1,6 +1,6 @@
-import { parseHeaders, streamEdit, testProvider } from "../src/ai";
+import { parseHeaders, streamChat, streamEdit, testProvider } from "../src/ai";
 import { DEFAULT_SETTINGS, migrateSettings, type Provider } from "../src/settings";
-import { assert, collect, startMockServer } from "./helpers";
+import { assert, collect, lastRequest, startMockServer } from "./helpers";
 
 const PORT = 18642;
 const hermes: Provider = { id: "h", name: "Hermes", type: "openai", baseUrl: `http://127.0.0.1:${PORT}/v1`, apiKey: "secret", model: "hermes-agent", effort: "medium", headers: "X-Hermes-Session-Key: obsidian", command: "", allowTools: false };
@@ -12,6 +12,20 @@ const server = await startMockServer(PORT);
 try {
   const chunks = await collect(streamEdit(hermes, settings, ctx, req, new AbortController().signal));
   assert.deepEqual(chunks, ["Hi ", "there, ", "friend."], "SSE deltas stream; foreign event lines are ignored");
+  const editBody = lastRequest.body as { messages: Array<{ role: string }> };
+  assert.deepEqual(editBody.messages.map((m) => m.role), ["system", "user"], "edits still send one system and one user message");
+
+  // multi-turn chat: the whole conversation reaches the server as separate turns
+  const convo = [
+    { role: "user" as const, content: "context + first question" },
+    { role: "assistant" as const, content: "first answer" },
+    { role: "user" as const, content: "follow-up" },
+  ];
+  const chatChunks = await collect(streamChat(hermes, settings, ctx, "chat system", convo, new AbortController().signal));
+  assert.deepEqual(chatChunks, ["Hi ", "there, ", "friend."]);
+  const chatBody = lastRequest.body as { messages: Array<{ role: string; content: string }>; stream: boolean };
+  assert.deepEqual(chatBody.messages, [{ role: "system", content: "chat system" }, ...convo]);
+  assert.equal(chatBody.stream, true);
 
   await assert.rejects(collect(streamEdit({ ...hermes, apiKey: "wrong" }, settings, ctx, req, new AbortController().signal)), /Authentication failed.*bad key/);
 

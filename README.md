@@ -36,13 +36,17 @@ Watch the [full trailer](docs/media/trailer-preview.mp4) (MP4, 960p preview).
 
 - **Edit in place.** Right-click a selection, type an instruction, and the replacement streams into
   the note while the passage is highlighted. One undo step reverts it.
+- **Ask AI about it.** Right-click and choose *Ask AI about selection* (or *about this note*): a
+  sidebar chat opens where you can ask follow-up questions, then copy an answer, insert it at the
+  cursor or let it replace the selection.
 - **Write at the cursor.** With nothing selected, the AI writes new text at the cursor with the full
   note as context.
 - **Your subscription, no key required.** The default agent runs the locally installed Claude Code
   CLI and reuses its login. Codex works the same way with the ChatGPT login.
 - **Any other agent.** Anthropic or OpenAI API keys, OpenAI-compatible servers (Hermes Agent, Ollama,
   LM Studio, OpenRouter, vLLM), and Agent Client Protocol agents over stdio.
-- **Desktop and mobile.** Phones use the bundled bridge to reach a subscription on a computer.
+- **Desktop and mobile.** Phones use the bundled bridge to reach a subscription on a computer; scan
+  the QR code the bridge prints and the phone is set up.
 - **Transparent.** A sidebar panel logs every edit with the original text, the exact output, the
   model's reasoning where the agent exposes it, and errors.
 
@@ -64,6 +68,7 @@ The full walkthrough is in [docs/getting-started.md](docs/getting-started.md).
 | [Getting started](docs/getting-started.md) | Installation, the setup wizard, first edit, mobile |
 | [Agents](docs/agents.md) | Claude Code, Codex, API keys, ACP agents, OpenAI-compatible servers, Hermes |
 | [Bridge](docs/bridge.md) | Using a subscription from a phone or another computer |
+| [Setup links](docs/setup-links.md) | Setting up an agent from a QR code; the link format for your own generators |
 | [Usage](docs/usage.md) | Prompt box, cursor mode, the edits panel, commands, settings |
 | [Troubleshooting](docs/troubleshooting.md) | Common errors and how to read the edits panel |
 | [Architecture](docs/architecture.md) | How the editor extension, backends and bridge fit together |
@@ -76,7 +81,9 @@ The full walkthrough is in [docs/getting-started.md](docs/getting-started.md).
 - Obsidian 1.7.2 or newer (desktop and mobile).
 - For subscription use on desktop: [Claude Code](https://docs.claude.com/en/docs/claude-code) (`claude`)
   and/or the [Codex CLI](https://developers.openai.com/codex/cli) (`codex`), logged in.
-- For mobile subscription use: a computer running the bridge (Node 18 or newer).
+- For mobile subscription use: a computer running the bridge (Node 18 or newer). From a clone of
+  this repository, `npm install && npm run build && npm run bridge:setup -- --install` sets it up and
+  shows the QR code for the phone; see [docs/bridge.md](docs/bridge.md).
 - An account with the AI provider you choose: a Claude or ChatGPT subscription, or an Anthropic or
   OpenAI API key (pay per use), or your own OpenAI-compatible server.
 
@@ -103,8 +110,10 @@ The **Test** button on an agent card makes one request to the same endpoint (`/m
 
 **What is sent.** Every edit sends the full content of the current note (capped at 150,000 characters
 before and after the target for very large notes), the note's name, the selected text or the cursor
-position, your instruction, and the *Extra instructions* from the settings. No other notes and no
-vault metadata are sent. Nothing is sent when you only open the prompt box.
+position, your instruction, and the *Extra instructions* from the settings. Every question in the
+*Ask AI* chat sends the note's current full content (capped at 300,000 characters), the selected
+passage if the chat is about one, and the conversation so far. No other notes and no vault metadata
+are sent. Nothing is sent when you only open the prompt box or the chat.
 
 **External executables.** On desktop, and only for agents of the types *Claude Code CLI*, *Codex CLI*
 and *ACP agent*, the plugin starts a local process with the command you configured: `claude -p`
@@ -120,6 +129,11 @@ text in the vault's `.obsidian/plugins/notekit-edit/data.json`, together with th
 configuration and the last 50 entries of the edits panel (instruction, original text, output and
 reasoning). Exclude that file from syncs or backups you do not trust, and remember that vault sync
 services copy it. The CLI agents store nothing in Obsidian; they reuse the login kept by the CLI.
+
+**Setup links and QR codes.** The QR code the bridge prints, and any `obsidian://notekit-edit` setup
+link, can contain an API or bridge key; treat them like the key itself. Opening a link never saves
+anything without confirmation, and a link can only add network agents, never one that starts a
+program. See [docs/setup-links.md](docs/setup-links.md).
 
 **Accounts and payment.** The plugin is free and open source, but every agent needs an account with
 its provider: a Claude Pro/Max or ChatGPT subscription for the CLI agents, a paid Anthropic or OpenAI

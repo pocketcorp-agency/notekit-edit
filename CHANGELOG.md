@@ -8,6 +8,16 @@ as Obsidian requires.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-25
+
+### Added
+- **Ask AI** chat: right-click and choose *Ask AI about selection* or *Ask AI about this note* (or the command *Ask AI about selection or note*) to open a sidebar chat about the passage or the whole note. Each question sends the note's latest content; answers render as Markdown and can be copied, inserted at the cursor or replace the selection. Works with every agent type; the CLI and ACP agents receive the conversation as a transcript.
+- Set up an agent by scanning a QR code: the bridge prints a QR code and an `obsidian://notekit-edit` setup link when it starts; the phone's camera opens Obsidian, which confirms and adds the agent. New bridge options `--public-url` and `--no-qr`.
+- Settings > **Import setup link** accepts the same link pasted as text.
+- `npm run bridge:setup` sets up the bridge in one command: checks the CLI login, keeps a random key in `~/.config/notekit-bridge/key`, prints the pairing QR code, and with `--install` runs the bridge in the background at login (launchd on macOS, systemd on Linux). `--pair` shows the QR code again, `--uninstall` removes the service.
+- Bridge options `--key-file` (read the key from a file, keeping it out of the process list) and `--pair` (print the setup QR code and exit); the bridge also stops cleanly on SIGTERM.
+- The setup-link format is documented in `docs/setup-links.md` so other software can generate compatible QR codes. Links can only describe OpenAI-compatible and Anthropic agents, never local agents or commands.
+
 ## [0.2.1] - 2026-09-22
 
 Preparation for the Obsidian community plugin directory.
@@ -51,7 +61,8 @@ Preparation for the Obsidian community plugin directory.
 ### Added
 - First version: select text, describe the change in a small prompt box, and the passage is rewritten in place by Claude (Anthropic API key) with a streaming highlight.
 
-[Unreleased]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.2.1...HEAD
+[Unreleased]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.2.1...0.3.0
 [0.2.1]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/pocketcorp-agency/notekit-edit/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/pocketcorp-agency/notekit-edit/releases/tag/0.1.0
